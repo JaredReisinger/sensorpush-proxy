@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -23,7 +22,7 @@ func NewClient(baseURL string) (*Client, error) {
 	// sanity-check the baseURL?
 	url, err := url.Parse(baseURL)
 	if err != nil {
-		log.Print("???????")
+		// log.Print("???????")
 		return nil, err
 	}
 

@@ -37,7 +37,7 @@ type samplesResponse struct {
 }
 
 // Sample gets the last sample for a given device
-func (c *Client) Sample(deviceID string) (*Sample, error) {
+func (c *Client) LastSample(deviceID string) (*Sample, error) {
 	samples := &samplesResponse{}
 	err := c.authCall("samples", &samplesRequest{Sensors: []string{deviceID}, Limit: 1}, samples, 0)
 	if err != nil {

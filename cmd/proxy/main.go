@@ -19,13 +19,24 @@ const (
 	appName = "sensorpush-proxy"
 )
 
+type config struct {
+	SensorPush struct {
+		Username  string
+		Password  string
+		DeviceIDs map[string]string
+	}
+	Proxy struct {
+		Port string
+	}
+}
+
 func main() {
 	log.Print(appName)
 
-	viper.SetDefault("username", "")
-	viper.SetDefault("password", "")
-	viper.SetDefault("deviceId", "")
-	viper.SetDefault("port", ":5375")
+	// viper.SetDefault("username", "")
+	// viper.SetDefault("password", "")
+	// viper.SetDefault("deviceId", "")
+	viper.SetDefault("proxy.port", ":5375")
 
 	viper.SetConfigName("config")
 	// viper.SetConfigType("yaml") // setting the config type takes precedence
@@ -37,6 +48,7 @@ func main() {
 	viper.AddConfigPath(".")
 
 	viper.SetEnvPrefix("SENSORPUSH")
+
 	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()
@@ -50,14 +62,35 @@ func main() {
 		}
 	}
 
-	user := viper.GetString("username")
-	pass := viper.GetString("password")
-	deviceID := viper.GetString("deviceId")
-	port := viper.GetString("port")
+	var c config
+	viper.Unmarshal(&c)
+	log.Printf("unmarshaled config: %+v", c)
 
-	if user == "" || pass == "" || deviceID == "" || port == "" {
-		log.Fatalf("one of SENSORPUSH_USERNAME (%q), SENSORPUSH_PASSWORD (length %d), SENSORPUSH_DEVICE_ID (%q), or SENSORPUSH_PORT (%q) is missing", user, len(pass), deviceID, port)
+	invalidArgs := []string{}
+
+	user := viper.GetString("username")
+	if user == "" {
+		invalidArgs = append(invalidArgs, "--username (SENSORPUSH_USERNAME)")
 	}
+
+	pass := viper.GetString("password")
+	if pass == "" {
+		invalidArgs = append(invalidArgs, "--password (SENSORPUSH_PASSWORD)")
+	}
+
+	// deviceID := viper.GetString("deviceId")
+	port := viper.GetString("port")
+	if port == "" {
+		invalidArgs = append(invalidArgs, "--port (SENSORPUSH_PORT)")
+	}
+
+	if len(invalidArgs) > 0 {
+		log.Fatalf("invalid or missing args:\n  %s", strings.Join(invalidArgs, "\n  "))
+	}
+
+	// if user == "" || pass == "" || /* deviceID == "" || */ port == "" {
+	// 	log.Fatalf("one of SENSORPUSH_USERNAME (%q), SENSORPUSH_PASSWORD (length %d), SENSORPUSH_DEVICE_ID (%q), or SENSORPUSH_PORT (%q) is missing", user, len(pass), deviceID, port)
+	// }
 
 	// ensure port has a ":" prefix?...
 	if !strings.HasPrefix(port, ":") {
@@ -77,7 +110,7 @@ func main() {
 	appCtx, appCancel := context.WithCancel(context.Background())
 
 	updater := func() {
-		sample, err := client.Sample(deviceID)
+		sample, err := client.LastSample("deviceID")
 		if err != nil {
 			log.Printf("unable to get sample: %+v", err)
 			// if we're X? past the last successful call, it's time to cancel

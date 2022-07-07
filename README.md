@@ -1,6 +1,9 @@
 # sensorpush-proxy
 
-A rate-limiting, authentication-hiding proxy for SensorPush data
+A rate-limiting, authentication-hiding proxy for SensorPush data.
+
+
+Uses the [SensorPush API](https://www.sensorpush.com/gateway-cloud-api) to fetch data.
 
 ----
 
