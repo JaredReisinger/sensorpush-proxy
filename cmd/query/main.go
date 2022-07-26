@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/jaredreisinger/sensorpush-proxy/pkg/asp"
 	cfg "github.com/jaredreisinger/sensorpush-proxy/pkg/config"
 	"github.com/jaredreisinger/sensorpush-proxy/pkg/sensorpush"
 )
@@ -16,6 +19,27 @@ const (
 
 func main() {
 	log.Print(appName)
+
+	cmd := &cobra.Command{
+		Run: func(cmd *cobra.Command, args []string) {
+			log.Printf("running command...")
+			a := cmd.Context().Value(asp.ContextKey).(asp.Asp[cfg.Config])
+			a.Debug()
+			config := a.Config()
+			log.Printf("got config: %+v", config)
+		},
+	}
+
+	a, err := asp.Attach(cmd, cfg.Default, "APP_")
+	cobra.CheckErr(err)
+
+	ctx := context.WithValue(context.Background(), asp.ContextKey, a)
+
+	cmd.ExecuteContext(ctx)
+
+	if true {
+		return
+	}
 
 	config, err := cfg.Init()
 	if err != nil {
