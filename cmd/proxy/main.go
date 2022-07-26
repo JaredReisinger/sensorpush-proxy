@@ -33,9 +33,9 @@ type config struct {
 func main() {
 	log.Print(appName)
 
-	// viper.SetDefault("username", "")
-	// viper.SetDefault("password", "")
-	// viper.SetDefault("deviceId", "")
+	// viper.SetDefault("sensorPush.username", "")
+	// viper.SetDefault("sensorPush.password", "")
+	// viper.SetDefault("sensorPush.deviceId", "")
 	viper.SetDefault("proxy.port", ":5375")
 
 	viper.SetConfigName("config")
@@ -68,18 +68,18 @@ func main() {
 
 	invalidArgs := []string{}
 
-	user := viper.GetString("username")
+	user := viper.GetString("sensorPush.username")
 	if user == "" {
 		invalidArgs = append(invalidArgs, "--username (SENSORPUSH_USERNAME)")
 	}
 
-	pass := viper.GetString("password")
+	pass := viper.GetString("sensorPush.password")
 	if pass == "" {
 		invalidArgs = append(invalidArgs, "--password (SENSORPUSH_PASSWORD)")
 	}
 
-	// deviceID := viper.GetString("deviceId")
-	port := viper.GetString("port")
+	// deviceID := viper.GetString("sensorPush.deviceIds")
+	port := viper.GetString("proxy.port")
 	if port == "" {
 		invalidArgs = append(invalidArgs, "--port (SENSORPUSH_PORT)")
 	}

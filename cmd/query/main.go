@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/viper"
 
+	cfg "github.com/jaredreisinger/sensorpush-proxy/pkg/config"
 	"github.com/jaredreisinger/sensorpush-proxy/pkg/sensorpush"
 )
 
@@ -16,8 +17,18 @@ const (
 func main() {
 	log.Print(appName)
 
-	viper.SetDefault("username", "")
-	viper.SetDefault("password", "")
+	config, err := cfg.Init()
+	if err != nil {
+		log.Fatalf("ERROR: (%T) %s", err, err.Error())
+	}
+	log.Printf("got config: %#v", config)
+
+	if true {
+		return
+	}
+
+	viper.SetDefault("sensorPush.username", "")
+	viper.SetDefault("sensorPush.password", "")
 	// viper.SetDefault("deviceId", "")
 	// viper.SetDefault("port", ":5375")
 
@@ -33,7 +44,7 @@ func main() {
 	viper.SetEnvPrefix("SENSORPUSH")
 	viper.AutomaticEnv()
 
-	err := viper.ReadInConfig()
+	err = viper.ReadInConfig()
 	if err != nil {
 		switch err.(type) {
 		case viper.ConfigFileNotFoundError:
@@ -44,8 +55,8 @@ func main() {
 		}
 	}
 
-	user := viper.GetString("username")
-	pass := viper.GetString("password")
+	user := viper.GetString("sensorPush.username")
+	pass := viper.GetString("sensorPush.password")
 	// deviceID := viper.GetString("deviceId")
 	// port := viper.GetString("port")
 
