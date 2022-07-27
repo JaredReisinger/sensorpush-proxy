@@ -37,15 +37,22 @@ const (
 )
 
 // parentCanonical and parentEnv come "pre-suffixed"
-func getAttributes(f reflect.StructField, parentCanonical string, envPrefix string) (
-	canonicalName string, attrLong string, attrShort string, attrEnv string, attrDesc string) {
+func getAttributes(f reflect.StructField,
+	parentCanonical string, parentEnv string) (
+	canonicalName string,
+	attrLong string, attrShort string, attrEnv string, attrDesc string) {
 
 	canonicalName = fmt.Sprintf("%s%s", parentCanonical, f.Name)
+
+	// note that we use "just uppercase" for the name, not
+	// strcase.ToScreamingSnake(), because convention for environment variables
+	// is to use '_' delimeters only at hierarchy boundaries
+	envName := fmt.Sprintf("%s%s", parentEnv, strings.ToUpper(f.Name))
 
 	// get attribute values...
 	attrLong = getAttribute(f, tagLong, allLong, strcase.ToKebab(canonicalName))
 	attrShort = getAttribute(f, tagShort, allShort, "")
-	attrEnv = getAttribute(f, tagEnv, allEnv, strcase.ToScreamingSnake(fmt.Sprintf("%s%s", envPrefix, canonicalName)))
+	attrEnv = getAttribute(f, tagEnv, allEnv, envName)
 	attrDesc = getAttribute(f, tagDesc, allDesc, fmt.Sprintf("sets the %s value", canonicalName))
 
 	return

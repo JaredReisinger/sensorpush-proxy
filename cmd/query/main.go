@@ -27,6 +27,7 @@ func main() {
 			a.Debug()
 			config := a.Config()
 			log.Printf("got config: %+v", config)
+			log.Printf("username value: %q", config.SensorPush.Username)
 		},
 	}
 
