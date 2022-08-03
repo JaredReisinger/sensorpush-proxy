@@ -150,7 +150,7 @@ func (a *asp[T]) Config() *T {
 	val := reflect.New(a.baseType)
 	// log.Printf("created config: %+v", val.Interface())
 	cfg := val.Interface().(*T)
-
+	// log.Printf("viper settings: %#v", a.vip.AllSettings())
 	err := a.vip.ReadInConfig()
 	if err != nil {
 		switch err.(type) {
