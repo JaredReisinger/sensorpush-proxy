@@ -1,6 +1,8 @@
 package config
 
 import (
+	"log"
+
 	"github.com/jaredreisinger/sensorpush-proxy/pkg/asp"
 	"github.com/spf13/cobra"
 )
@@ -54,10 +56,11 @@ func Init() (config *Config, err error) {
 		// Host: "default",
 		// private: "foo",
 	}
-	_ /*asp*/, err = asp.Attach(&cobra.Command{}, config, "APP_")
+	a, err := asp.Attach(&cobra.Command{}, *config)
 	// asp.Command().Usage()
-	// x := asp.Config()
-	// log.Printf("loaded config: %#v", x)
+	a.Debug()
+	x := a.Config()
+	log.Printf("loaded config: %#v", x)
 	// asp.Execute(func(cfg *Config, args []string) {
 	// 	log.Printf("inside inner func!!! %v", cfg)
 	// })

@@ -31,7 +31,7 @@ func main() {
 		},
 	}
 
-	a, err := asp.Attach(cmd, cfg.Default, "APP_")
+	a, err := asp.Attach(cmd, cfg.Default, asp.WithEnvPrefix[cfg.Config]("FOO_"))
 	cobra.CheckErr(err)
 
 	ctx := context.WithValue(context.Background(), asp.ContextKey, a)
