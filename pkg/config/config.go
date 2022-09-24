@@ -3,7 +3,7 @@ package config
 import (
 	"log"
 
-	"github.com/jaredreisinger/sensorpush-proxy/pkg/asp"
+	"github.com/jaredreisinger/asp"
 	"github.com/spf13/cobra"
 )
 

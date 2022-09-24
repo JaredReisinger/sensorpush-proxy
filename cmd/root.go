@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/jaredreisinger/sensorpush-proxy/pkg/asp"
+	"github.com/jaredreisinger/asp"
 )
 
 type SensorPushAuth struct {
