@@ -47,21 +47,9 @@ tasks:
       - go fmt -n ./...
       - go vet ./...
 
-  # ------- HOOKS -------
   pre-commit:
     cmds:
-      # - echo "pre-commit from Taskfile"
       - task: lint
-      # - task: test
-
-  prepare-commit-msg:
-    cmds:
-      #- echo "TODO golang-equivalent commitizen with args {{.CLI_ARGS}}"
-      - go run github.com/lintingzhen/commitizen-go
-
-  commit-msg:
-    cmds:
-      - echo "TODO golang-equivalent commitlint with args {{.CLI_ARGS}}"
 
   query:
     desc: Runs the {{.TASK}} command directly from source
