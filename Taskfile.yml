@@ -64,7 +64,7 @@ tasks:
   docker:
     desc: Builds the {{.APP_NAME}} Docker image
     cmds:
-      - docker build -t {{.APP_NAME}}:local .
+      - docker build --file Dockerfile.old --tag {{.APP_NAME}}:local .
 
   docker-query:
     desc: Runs the {{ .TASK | replace "docker-" "" }} command via the Docker image

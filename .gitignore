@@ -17,5 +17,7 @@
 # output
 /.task/
 /build/
+/dist/
 
 config.yaml
+

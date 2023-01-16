@@ -2,9 +2,9 @@ name: build
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   build:
@@ -17,19 +17,29 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
+          cache: true
           go-version: '>=1.19.1'
-
-      # - uses: actions/cache@v2
-      #   with:
-      #     path: ~/.npm
-      #     key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-node-
 
       - run: |
           go version
           go build -v -x -o build/sensorpush-proxy main.go
           ls -la build
+
+      - if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          install-only: true
+          
+      - if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+        uses: cycjimmy/semantic-release-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
+            @semantic-release/exec
+          dry_run: true
 
       - uses: act10ns/slack@v1
         if: always()

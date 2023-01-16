@@ -50,6 +50,10 @@ var configDefaults = Config{
 	},
 }
 
+// func SetVars(version string, commit string, date string) {
+// 	log.Printf()
+// }
+
 func Execute() {
 	a, err := asp.Attach(rootCmd, configDefaults, asp.WithEnvPrefix[Config]("SPP_"))
 	cobra.CheckErr(err)
