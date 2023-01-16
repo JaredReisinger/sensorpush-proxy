@@ -3,6 +3,13 @@
 _All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines._
 
 
+## [0.0.3](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.0.2...v0.0.3) (2023-01-16)
+
+
+### Bug Fixes
+
+* **build:** try single-stage Dockerfile for now ([90ada14](https://github.com/JaredReisinger/sensorpush-proxy/commit/90ada14de8cd8e136f51331033a13513d44927b1))
+
 ## [0.0.2](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.0.1...v0.0.2) (2023-01-16)
 
 
