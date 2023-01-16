@@ -3,6 +3,13 @@
 _All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines._
 
 
+## [0.0.4](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.0.3...v0.0.4) (2023-01-16)
+
+
+### Bug Fixes
+
+* **build:** try docker image/manifest variations ([fee216f](https://github.com/JaredReisinger/sensorpush-proxy/commit/fee216f0b0bb974ff0968a9a9dd393a4edd983ed))
+
 ## [0.0.3](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.0.2...v0.0.3) (2023-01-16)
 
 
