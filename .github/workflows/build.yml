@@ -39,7 +39,6 @@ jobs:
             @semantic-release/changelog
             @semantic-release/git
             @semantic-release/exec
-          dry_run: true
 
       - uses: act10ns/slack@v1
         if: always()
