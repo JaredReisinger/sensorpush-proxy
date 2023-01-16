@@ -1,0 +1,4 @@
+.dockerignore
+.task/
+build/
+**/*_test.go

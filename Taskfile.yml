@@ -1,0 +1,107 @@
+version: "3"
+
+vars:
+  APP_NAME: sensorpush-proxy
+  APP_EXE: "{{.APP_NAME}}{{exeExt}}"
+  BUILD_DIR: build
+  APP_PORT: 5375
+
+# env:
+#   APP_NAME: sensorpush-proxy
+#   BUILD_DIR: build
+
+tasks:
+  default:
+    deps:
+      - build
+
+  # The git hooks initialization isn't quite as streamlined as in Node/npm,
+  # where the package creator can "force install" the husky hooks during the
+  # "npm install" stage (which is a necessary precursor to doing any sort of
+  # development).  To approximate that, we have a "prepare" task that does the
+  # equivalent one-time local repo setup.  (Except for "task" itself, which is
+  # an annoying chicken-and-egg problem.)
+  prepare:
+    desc: One-time local repo setup
+    cmds:
+      - go mod download
+      - go run -v github.com/automation-co/husky install
+
+  build:
+    desc: Builds the {{.APP_NAME}} binary
+    sources:
+      - ./**/*.go
+    cmds:
+      - go get
+      - go generate -v
+      - go build -ldflags '-d -s -w' -tags netgo -o {{.BUILD_DIR}}/{{.APP_EXE}} .
+
+  test:
+    desc: Runs all the tests
+    cmds:
+      - go test ./...
+
+  lint:
+    desc: Runs common checks/vet/linting
+    cmds:
+      - go fmt -n ./...
+      - go vet ./...
+
+  # ------- HOOKS -------
+  pre-commit:
+    cmds:
+      # - echo "pre-commit from Taskfile"
+      - task: lint
+      # - task: test
+
+  prepare-commit-msg:
+    cmds:
+      #- echo "TODO golang-equivalent commitizen with args {{.CLI_ARGS}}"
+      - go run github.com/lintingzhen/commitizen-go
+
+  commit-msg:
+    cmds:
+      - echo "TODO golang-equivalent commitlint with args {{.CLI_ARGS}}"
+
+  query:
+    desc: Runs the {{.TASK}} command directly from source
+    cmds:
+      - go run main.go {{.TASK}}
+
+  proxy:
+    desc: Runs the {{.TASK}} command directly from source
+    cmds:
+      - go run main.go {{.TASK}}
+
+  docker:
+    desc: Builds the {{.APP_NAME}} Docker image
+    cmds:
+      - docker build -t {{.APP_NAME}}:local .
+
+  docker-query:
+    desc: Runs the {{ .TASK | replace "docker-" "" }} command via the Docker image
+    cmds:
+      - task: docker-run
+        vars:
+          SPP_ARGS: '{{ .TASK | replace "docker-" "" }}'
+
+  docker-proxy:
+    desc: Runs the {{ .TASK | replace "docker-" "" }} command via the Docker image
+    cmds:
+      - task: docker-run
+        vars:
+          RUN_ARGS: -p {{.APP_PORT}}:{{.APP_PORT}}
+          SPP_ARGS: '{{ .TASK | replace "docker-" "" }}'
+
+  docker-run:
+    internal: true
+    cmds:
+      # if you have a local config.yaml, it will be mounted in the /tmp dir
+      - docker run --rm -ti -v {{.ROOT_DIR}}:/tmp --workdir /tmp {{.RUN_ARGS}} {{.APP_NAME}}:local {{.SPP_ARGS}}
+
+  check:
+    desc: Calls a running proxy to get the JSON payload
+    # precondition isn't checked?
+    precondition: which http
+    cmds:
+      - http -v :{{.APP_PORT}}/sensors

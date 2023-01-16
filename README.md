@@ -1,6 +1,13 @@
 # sensorpush-proxy
 
-A rate-limiting, authentication-hiding proxy for SensorPush data.
+A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensorpush.com) data.
+
+
+## Usage
+
+More than likely, you want to use the already-built Docker container for this, so that you can just throw your credentials and sensor config at it and go.  The Docker image includes a helper `query` command so that you can more easily discover the IDs of your SensorPush sensors.
+
+
 
 
 Uses the [SensorPush API](https://www.sensorpush.com/gateway-cloud-api) to fetch data.
