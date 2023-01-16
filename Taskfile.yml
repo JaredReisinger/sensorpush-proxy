@@ -93,3 +93,8 @@ tasks:
     precondition: which http
     cmds:
       - http -v :{{.APP_PORT}}/sensors
+
+  release:
+    desc: Run a snapshot (test) release
+    cmds:
+      - goreleaser release --snapshot --rm-dist
