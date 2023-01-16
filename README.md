@@ -1,11 +1,32 @@
-# sensorpush-proxy
+> # THIS README IS A WORK-IN-PROGRESS!
+
+
+![sensorpush-proxy](./docs/sensorpush-proxy-logo.png)
 
 A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensorpush.com) data.
 
-
 ## Usage
 
-More than likely, you want to use the already-built Docker container for this, so that you can just throw your credentials and sensor config at it and go.  The Docker image includes a helper `query` command so that you can more easily discover the IDs of your SensorPush sensors.
+More than likely, you’ll want to use the already-built [Docker image](https://hub.docker.com/r/jaredreisinger/sensorpush-proxy) for this, so that you can just throw your credentials and sensor config at it and let it run behind something like Traefik or nginx.  Regardless of whether you use Docker or the raw binary, `sensorpush-proxy` includes both the proxy itself and also a `query` sub-command to help you discover the sensor IDs available to you.
+
+### Get SensorPush credentials
+
+If you have any SensorPush devices, you ought to already have an account with SensorPush.  In order to activate API access, you need to sign into their [Gateway Cloud Dashboard](https://dashboard.sensorpush.com/) at least once and agree to the terms of service.  Once you've done that, the username and password you use for that dashboard are the same ones you need for this proxy.  Unfortunately, SensorPush does not allow you to create limited-use (and revocable) tokens to use in place of your password for API access.  This proxy _**only**_ uses the password you provide in order to retrieve the sensor data you request.  Use secure best practices to ensure that the configuration you pass to this proxy is kept secret/encrypted until the last possible moment.
+
+### Get sensorpush-proxy
+
+
+
+
+### Discover sensor IDs
+
+Use the `query` subcommand
+
+
+### Docker image
+
+
+### Binary (from release or source)
 
 
 

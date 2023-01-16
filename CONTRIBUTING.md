@@ -52,7 +52,7 @@ When suggesting a new enhancement, please be as detailed as possible:
 
 ### Pull requests
 
-I’m a big fan of automating as much as possible; this means that where other projects might have prescriptive style guides you need to follow, most of sensorpush-proxy’s requirements are automatically applied by tooling (see [A note on tooling, below](#a-note-on-tooling)). Between `.editorconfig`, `.prettierrc.yaml`, `.stylelintrc.yaml`, `.eslintrc.yaml` and `.commitlint.yaml`, you are practically _forced_ into using the project’s standard style. Most of the time, your editor (VSCode, Atom, etc.) will simply take care of this for you, and you won’t even need to think about it.
+I’m a big fan of automating as much as possible; this means that where other projects might have prescriptive style guides you need to follow, most of sensorpush-proxy’s requirements are automatically applied by tooling (see also [`docs/tooling`](./docs/tooling.md)). Between `.editorconfig`, `.prettierrc.yaml`, `.stylelintrc.yaml`, `.eslintrc.yaml` and `.commitlint.yaml`, you are practically _forced_ into using the project’s standard style. Most of the time, your editor (VSCode, Atom, etc.) will simply take care of this for you, and you won’t even need to think about it.
 
 When you first clone/fork the repo, make sure that you have [`task`](https://taskfile.dev) 3.15 or newer (the project uses the `ROOT_DIR` special variable added in 3.15), and then run:
 
@@ -63,11 +63,3 @@ task prepare
 to set up all the tooling (e.g. git hooks).
 
 Your commit message should follow the [Conventional Commits](https://www.conventionalcommits.org) standard. There’s tooling for this, too; `git commit` _should_ run an interactive command-line that helps you create the correct format for the commit message if you’ve done the `task prepare` step. (But honestly, if the commit message isn’t in the“standard” form, don’t worry about it too much… I can adjust the PR to ensure that the right things happen.)  You can use `task commit` to force the interactive command to run, regardless.
-
-#### A note on tooling
-
-I have gotten _**very**_ accustomed to Node/npm tooling like `husky`, `commitizen`, `commitlint`, `semantic-release`, etc. This tooling is mature and full-featured and comes effectively “for free” as soon as you `npm install` in a cloned project. The tooling for Go doesn’t seem quite as mature, but I’m attempting to mirror it. One possibility would be to just use a bogus `package.json` and use npm packages, but that seems less “pure” than an all-Go solution. There’s also the language-agnostic-but-really-python `pre-commit` project, but it still suffers from the non-native bootstrapping problem.
-
-The solution I’m using at present is to find as many all-Go equivalents that I can, and—aside from the initial installation of `task`—use a single `task prepare` as a mirror of what `npm install` would do. (But where many npm `devDependencies` would auto-init during `npm install`, I have to manually perform the tooling setup during `task prepare` myself.)
-
-The good news is that I’m able to get to about XX% of the experience I like as a developer. The `task prepare` step sets up a [Go husky workalike](https://github.com/automation-co/husky), and those hooks then leverage the [Taskfile](./Taskfile.yml) to run the pre-commit and commit message hooks. On the semantic-release front, I don’t _really_ need to run that locally—as much as local dry-runs can be helpful—I really only need it to run as a part of CI, and I can do that directly as a GitHub action as long as the release configuration is in the project.

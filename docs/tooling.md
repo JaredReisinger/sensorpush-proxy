@@ -1,0 +1,7 @@
+# A note on tooling
+
+I have gotten _**very**_ accustomed to Node/npm tooling like `husky`, `commitizen`, `commitlint`, `semantic-release`, etc. This tooling is mature and full-featured and comes effectively “for free” as soon as you `npm install` in a cloned project. The tooling for Go doesn’t seem quite as mature, but I’m attempting to mirror it. One possibility would be to just use a bogus `package.json` and use npm packages, but that seems less “pure” than an all-Go solution. There’s also the language-agnostic-but-really-python `pre-commit` project, but it still suffers from the non-native bootstrapping problem.
+
+The solution I’m using at present is to find as many all-Go equivalents that I can, and—aside from the initial installation of `task`—use a single `task prepare` as a mirror of what `npm install` would do. (But where many npm `devDependencies` would auto-init during `npm install`, I have to manually perform the tooling setup during `task prepare` myself.)
+
+The good news is that I’m able to get to about 90% of the experience I like as a developer. The `task prepare` step sets up a [Go husky workalike](https://github.com/automation-co/husky), and those hooks (sometimes) then leverage the [Taskfile](./Taskfile.yml) to run the pre-commit and commit message hooks. On the semantic-release front, I don’t _really_ need to run that locally—as much as local dry-runs can be helpful—I really only need it to run as a part of CI, and I can do that directly as a GitHub action as long as the release configuration is in the project.
