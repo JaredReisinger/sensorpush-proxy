@@ -3,6 +3,13 @@
 _All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines._
 
 
+## [0.0.6](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.0.5...v0.0.6) (2023-01-17)
+
+
+### Bug Fixes
+
+* **build:** push arch images ([7f08cb5](https://github.com/JaredReisinger/sensorpush-proxy/commit/7f08cb5a6c7178411134cf68e3328b9a1df16942))
+
 ## [0.0.5](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.0.4...v0.0.5) (2023-01-17)
 
 
