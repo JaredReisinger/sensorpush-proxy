@@ -8,17 +8,6 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
-    # goos:
-    #   - linux
-    #   - windows
-    #   - darwin
-    # targets:
-    #   - linux_amd64
-    #   - linux_arm64
-    #   - darwin_amd64
-    #   - darwin_arm64
-    #   - windows_amd64
-    #   - windows_arm64
     tags:
       - netgo
     ldflags:
@@ -32,14 +21,15 @@ dockers:
     goarch: amd64
     build_flag_templates:
       - --platform=linux/amd64
-    skip_push: true
+    # skip_push: true
+
   - image_templates:
       - "jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64"
     use: buildx
     goarch: arm64
     build_flag_templates:
       - --platform=linux/arm64
-    skip_push: true
+    # skip_push: true
 
 # single-platform docker images can easily have multiple tags, but doing the
 # same for multi-platform manifests is a bit tricker.
