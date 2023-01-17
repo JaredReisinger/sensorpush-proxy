@@ -1,0 +1,17 @@
+# Sometimes it's handy to be able to jump inside a Docker image and run ad-hoc
+# analysis tools... but since we're building microcontainers, there's no shell
+# or anything!  As a workaround, this Dockerfile is a forensic environment with
+# the binary copied in from the micro-container image.
+
+ARG IMAGE_VERSION=0.0.5-next
+ARG IMAGE_ARCH=amd64
+
+FROM --platform=linux/${IMAGE_ARCH} jaredreisinger/sensorpush-proxy:${IMAGE_VERSION}-${IMAGE_ARCH} as binary
+
+FROM alpine
+
+RUN \
+    apk update && \
+    apk add file
+
+COPY --from=binary /sensorpush-proxy /

@@ -87,6 +87,16 @@ tasks:
       # if you have a local config.yaml, it will be mounted in the /tmp dir
       - docker run --rm -ti -v {{.ROOT_DIR}}:/tmp --workdir /tmp {{.RUN_ARGS}} {{.APP_NAME}}:local {{.SPP_ARGS}}
 
+  docker-analyze:
+    cmds:
+      - docker build -f Dockerfile.analyze -t analyze:local .
+      - docker run --rm -ti analyze:local
+
+  docker-analyze-arm64:
+    cmds:
+      - docker build -f Dockerfile.analyze -t analyze:local --build-arg IMAGE_ARCH=arm64 .
+      - docker run --rm -ti analyze:local
+
   check:
     desc: Calls a running proxy to get the JSON payload
     # precondition isn't checked?

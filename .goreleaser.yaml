@@ -10,30 +10,33 @@ builds:
       - CGO_ENABLED=0
     # goos:
     #   - linux
-    #   # - windows
-    #   # - darwin
-    targets:
-      - linux_amd64
-      - linux_arm64
-      - darwin_amd64
-      - darwin_arm64
-      - windows_amd64
-      - windows_arm64
+    #   - windows
+    #   - darwin
+    # targets:
+    #   - linux_amd64
+    #   - linux_arm64
+    #   - darwin_amd64
+    #   - darwin_arm64
+    #   - windows_amd64
+    #   - windows_arm64
     tags:
       - netgo
     ldflags:
-      - -d -s -w -X main.version={{.Version}} -X main.commit={{.FullCommit}} -X main.date={{.Date}} -X main.builtBy=goreleaser
+      - -s -w -X main.version={{.Version}} -X main.commit={{.FullCommit}} -X main.date={{.Date}} -X main.builtBy=goreleaser
+      - '{{ if eq .Os "linux" }}-d{{ end }}'
 
 dockers:
   - image_templates:
       - "jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64"
     use: buildx
+    goarch: amd64
     build_flag_templates:
       - --platform=linux/amd64
     skip_push: true
   - image_templates:
       - "jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64"
     use: buildx
+    goarch: arm64
     build_flag_templates:
       - --platform=linux/arm64
     skip_push: true
@@ -63,7 +66,7 @@ archives:
     # this name template makes the OS and Arch compatible with the results of uname.
     name_template: >-
       sensorpush-proxy_
-      {{- title .Os }}_
+      {{- .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
