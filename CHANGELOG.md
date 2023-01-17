@@ -3,6 +3,13 @@
 _All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines._
 
 
+## [0.0.5](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.0.4...v0.0.5) (2023-01-17)
+
+
+### Bug Fixes
+
+* **build:** fix build flags and arm image ([0b876c3](https://github.com/JaredReisinger/sensorpush-proxy/commit/0b876c3393dbafbebc6d1fe307353d44ea4a3427))
+
 ## [0.0.4](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.0.3...v0.0.4) (2023-01-16)
 
 
