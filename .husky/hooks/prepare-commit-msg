@@ -14,4 +14,6 @@ if [ "$(grep -v '^#' $1 | wc --max-line-length)" -eq "0" ]; then
   # tooling building blocks.  (It also doesn't take the COMMIT_MSG filename
   # argument as it should.)
   exec < /dev/tty && go run github.com/lintingzhen/commitizen-go
+else
+  ${VISUAL:-${EDITOR:-vi}} $1
 fi
