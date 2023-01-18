@@ -29,7 +29,7 @@ Note that in the below `sensorpush-proxy` command lines, you will need to use so
 
 ### Discover sensor IDs
 
-Use the `query` subcommand with your SensorPush credentials to discovrer the sensor IDs available to you:
+Use the `query` subcommand with your SensorPush credentials to discover the sensor IDs available to you:
 
 ```
 sensorpush-proxy query --username YOUR_SENSORPUSH_USERNAME --password YOUR_SENSORPUSH_PASSWORD

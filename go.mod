@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/automation-co/husky v0.2.16
 	github.com/conventionalcommit/commitlint v0.10.0
-	github.com/jaredreisinger/asp v0.0.0-20220924060121-799a589fc19f
+	github.com/jaredreisinger/asp v0.0.2
 	github.com/lintingzhen/commitizen-go v1.0.3
 	github.com/spf13/cobra v1.5.0
 )
@@ -16,6 +16,8 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/frankban/quicktest v1.14.4 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
+	github.com/google/uuid v1.3.0 // indirect
+	github.com/gookit/color v1.5.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
@@ -26,9 +28,11 @@ require (
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/nbutton23/zxcvbn-go v0.0.0-20210217022336-fa2cb2858354 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/securego/gosec/v2 v2.14.0 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
@@ -37,11 +41,13 @@ require (
 	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
 	github.com/urfave/cli/v2 v2.11.1 // indirect
+	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
-	golang.org/x/mod v0.5.1 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/term v0.3.0 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.3.8 // indirect
+	golang.org/x/tools v0.1.12 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
