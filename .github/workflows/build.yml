@@ -20,10 +20,14 @@ jobs:
           cache: true
           go-version: '>=1.19.1'
 
-      - run: |
-          go version
-          go build -v -x -o build/sensorpush-proxy main.go
-          ls -la build
+      - uses: arduino/setup-task@v1
+        with:
+          # version: 3.20 # 3.x is good enough
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: task test
+
+      - uses: codecov/codecov-action@v3
 
       - if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
         uses: goreleaser/goreleaser-action@v4

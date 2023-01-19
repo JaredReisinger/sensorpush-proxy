@@ -6,7 +6,7 @@ import (
 
 type sensorsRequest struct{}
 
-// Gateway is a single gateway descriptor
+// Sensor is a single sensor descriptor
 type Sensor struct {
 	Active  bool   `json:"active"`
 	Address string `json:"address"`
@@ -23,7 +23,7 @@ type Sensor struct {
 
 type Sensors map[string]Sensor
 
-// Gateways gets a list of gateways
+// Sensors gets a list of sensors
 func (c *Client) Sensors() (*Sensors, error) {
 	sensors := &Sensors{}
 	err := c.authCall("devices/sensors", &sensorsRequest{}, sensors, 0)

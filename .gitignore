@@ -18,6 +18,7 @@
 /.task/
 /build/
 /dist/
+/coverage/
 
 config.yaml
 

@@ -3,9 +3,15 @@ package sensorpush
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 
 	"github.com/jaredreisinger/sensorpush-proxy/pkg/jsonapi"
 )
+
+type ApiClient interface {
+	Header() http.Header
+	Call(url string, body interface{}, response interface{}) error
+}
 
 // Client is a SensorPush client
 type Client struct {
@@ -14,7 +20,8 @@ type Client struct {
 	authToken   string
 	accessToken string
 
-	client *jsonapi.Client
+	// client *jsonapi.Client
+	client ApiClient
 }
 
 const apiBase = "https://api.sensorpush.com/api/v1/"
@@ -26,6 +33,11 @@ func NewClient(email string, password string) (*Client, error) {
 		return nil, err
 	}
 
+	return NewClientWithApiClient(email, password, client)
+}
+
+// NewClientWithApiClient creates a new SensorPush client
+func NewClientWithApiClient(email string, password string, client ApiClient) (*Client, error) {
 	return &Client{
 		email:    email,
 		password: password,
@@ -62,7 +74,7 @@ type accessTokenResponse struct {
 }
 
 func (c *Client) authorize() error {
-	c.client.DefaultHeader.Del("Authorization")
+	c.client.Header().Del("Authorization")
 
 	authorize := &authorizeResponse{}
 	err := c.client.Call("oauth/authorize", &authorizeRequest{Email: c.email, Password: c.password}, authorize)
@@ -85,7 +97,7 @@ func (c *Client) access(depth int) error {
 		}
 	}
 
-	c.client.DefaultHeader.Del("Authorization")
+	c.client.Header().Del("Authorization")
 
 	accessToken := &accessTokenResponse{}
 	err = c.client.Call("oauth/accesstoken", &accessTokenRequest{Authorization: c.authToken}, accessToken)
@@ -94,7 +106,7 @@ func (c *Client) access(depth int) error {
 		// log.Printf("got access token: %+v", accessToken)
 		c.accessToken = accessToken.AccessToken
 		// also update the default headers...
-		c.client.DefaultHeader.Set("Authorization", c.accessToken)
+		c.client.Header().Set("Authorization", c.accessToken)
 		return nil
 	}
 

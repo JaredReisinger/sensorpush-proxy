@@ -5,6 +5,7 @@ vars:
   APP_EXE: "{{.APP_NAME}}{{exeExt}}"
   BUILD_DIR: build
   APP_PORT: 5375
+  COVERAGE_DIR: ./coverage
 
 # env:
 #   APP_NAME: sensorpush-proxy
@@ -27,6 +28,12 @@ tasks:
       - go mod download
       - go run -v github.com/automation-co/husky install
 
+  clean:
+    desc: Clean project
+    cmds:
+      - rm -rf {{.COVERAGE_DIR}}
+      - rm -rf .task
+
   build:
     desc: Builds the {{.APP_NAME}} binary
     sources:
@@ -36,10 +43,20 @@ tasks:
       - go generate -v
       - go build -ldflags '-d -s -w' -tags netgo -o {{.BUILD_DIR}}/{{.APP_EXE}} .
 
+  coveragedir:
+    desc: Create coverage directory
+    cmds:
+      - mkdir {{.COVERAGE_DIR}}
+    status:
+      - test -d {{.COVERAGE_DIR}}
+
   test:
     desc: Runs all the tests
+    deps:
+      - coveragedir
     cmds:
-      - go test ./...
+      - go test -coverprofile {{.COVERAGE_DIR}}/cover.out ./...
+      - go tool cover -html {{.COVERAGE_DIR}}/cover.out -o {{.COVERAGE_DIR}}/coverage.html
 
   lint:
     desc: Runs common checks/vet/linting

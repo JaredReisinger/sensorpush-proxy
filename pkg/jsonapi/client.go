@@ -9,16 +9,29 @@ import (
 	"time"
 )
 
+// Wraps http.Client in an interface so that we can mock it for testing.
+type HTTPRequestDoer interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 // Client represents a JSON REST API client.
 type Client struct {
-	baseURL       string
-	base          *url.URL
-	client        *http.Client
-	DefaultHeader http.Header
+	baseURL   string
+	base      *url.URL
+	requester HTTPRequestDoer
+	// DefaultHeader http.Header
+	header http.Header
 }
 
 // NewClient creates a new JSONAPIClient.
 func NewClient(baseURL string) (*Client, error) {
+	return NewClientWithDoer(baseURL, &http.Client{
+		Timeout: 10 * time.Second,
+	})
+}
+
+// NewClientWithDoer creates a new JSONAPIClient with a specific request doer.
+func NewClientWithDoer(baseURL string, requestDoer HTTPRequestDoer) (*Client, error) {
 	// sanity-check the baseURL?
 	url, err := url.Parse(baseURL)
 	if err != nil {
@@ -26,16 +39,16 @@ func NewClient(baseURL string) (*Client, error) {
 		return nil, err
 	}
 
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
-
 	return &Client{
-		baseURL:       baseURL,
-		base:          url,
-		client:        client,
-		DefaultHeader: make(http.Header),
+		baseURL:   baseURL,
+		base:      url,
+		requester: requestDoer,
+		header:    make(http.Header),
 	}, nil
+}
+
+func (c *Client) Header() http.Header {
+	return c.header
 }
 
 // auto-unmarshal error bodies?
@@ -63,12 +76,12 @@ func (c *Client) Call(relURL string, body interface{}, response interface{}) err
 	}
 
 	// Add the default headers...
-	req.Header = c.DefaultHeader.Clone()
+	req.Header = c.header.Clone()
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
 
-	res, err := c.client.Do(req)
+	res, err := c.requester.Do(req)
 
 	if err != nil {
 		// log.Printf("WHAT???\n\n\t%+v", res)
@@ -77,6 +90,7 @@ func (c *Client) Call(relURL string, body interface{}, response interface{}) err
 	defer res.Body.Close()
 
 	b, err = ioutil.ReadAll(res.Body)
+	// log.Printf("got JSON: %q", b)
 	if err != nil {
 		return err
 	}

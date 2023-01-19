@@ -18,15 +18,12 @@ type SensorPushAuth struct {
 
 type ProxyConfig struct {
 	Port      string            `asp.long:"port"`
-	DeviceIDs map[string]string `asp.long:"device-ids" asp.desc:"sets the Proxy.DeviceIDs value, which provides symbolic names for the device IDs to fetch and return. Use\n  symbolicName=numeric-device-id,otherName=another-id\nstyle formatting for the values"`
+	DeviceIDs map[string]string `asp.long:"device-ids" asp.desc:"sets the Proxy.DeviceIDs value, which provides symbolic names for\nthe device IDs to fetch and return. Use\n  symbolicName=numeric-device-id,otherName=another-id\nstyle formatting for the values"`
 }
 
 type Config struct {
 	SensorPush struct {
-		// Username  string            `asp.long:"username" asp.short:"u"`
-		// Password  string            `asp.long:"password" asp.short:"p"`
 		SensorPushAuth `mapstructure:",squash"`
-		// DeviceIDs      map[string]string `asp.long:"device-ids" asp.desc:"provides symbolic names for the device IDs to fetch and return.\nUse\n  symbolicName=numeric-device-id,otherName=another-id\nstyle formatting for the values"`
 	}
 
 	Proxy ProxyConfig
