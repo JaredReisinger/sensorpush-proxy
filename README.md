@@ -2,6 +2,13 @@
 
 A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensorpush.com) data.
 
+[![Go reference](https://img.shields.io/badge/pkg.go.dev-reference-007D9C?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/jaredreisinger/sensorpush-proxy)
+![Go version](https://img.shields.io/github/go-mod/go-version/jaredreisinger/sensorpush-proxy?logo=go&logoColor=white&style=flat-square)
+[![GitHub build](https://img.shields.io/github/actions/workflow/status/jaredreisinger/sensorpush-proxy/build.yml?branch=main&logo=github&style=flat-square)](https://github.com/jaredreisinger/asp/actions/workflows/build.yml)
+[![Codecov](https://img.shields.io/codecov/c/github/jaredreisinger/sensorpush-proxy?logo=codecov&label=codedov&style=flat-square)](https://codecov.io/gh/JaredReisinger/sensorpush-proxy)
+[![License](https://img.shields.io/github/license/jaredreisinger/sensorpush-proxy?style=flat-square)](https://github.com/JaredReisinger/sensorpush-proxy/blob/main/LICENSE)
+
+
 <!-- TOC -->
 
 - [Usage](#usage)
