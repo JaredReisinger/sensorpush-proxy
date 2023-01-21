@@ -3,6 +3,13 @@
 _All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines._
 
 
+# [0.1.0](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.0.7...v0.1.0) (2023-01-21)
+
+
+### Features
+
+* add update period ([7d6d029](https://github.com/JaredReisinger/sensorpush-proxy/commit/7d6d0290cfa4036fc583928f44744417edd04c22))
+
 ## [0.0.7](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.0.6...v0.0.7) (2023-01-18)
 
 
