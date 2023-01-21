@@ -11,16 +11,20 @@ import (
 	"github.com/jaredreisinger/asp"
 )
 
+// SensorPushAuth is the authentication information needed for SensorPush.
 type SensorPushAuth struct {
 	Username string `asp.long:"username" asp.short:"u"`
 	Password string `asp.long:"password" asp.short:"p"`
 }
 
+// ProxyConfig is the configuration for the HTTP proxy that sensorpush-proxy
+// provides.
 type ProxyConfig struct {
 	Port      string            `asp.long:"port"`
 	DeviceIDs map[string]string `asp.long:"device-ids" asp.desc:"sets the Proxy.DeviceIDs value, which provides symbolic names for\nthe device IDs to fetch and return. Use\n  symbolicName=numeric-device-id,otherName=another-id\nstyle formatting for the values"`
 }
 
+// Config is the all-up configuration for sensorpush-proxy.
 type Config struct {
 	SensorPush struct {
 		SensorPushAuth `mapstructure:",squash"`
@@ -51,6 +55,7 @@ var configDefaults = Config{
 // 	log.Printf()
 // }
 
+// Execute is the main entrypoint into the sensorpush-proxy CLI.
 func Execute() {
 	a, err := asp.Attach(rootCmd, configDefaults, asp.WithEnvPrefix[Config]("SPP_"))
 	cobra.CheckErr(err)

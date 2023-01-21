@@ -8,12 +8,13 @@ import (
 	"github.com/jaredreisinger/sensorpush-proxy/pkg/jsonapi"
 )
 
+// ApiClient is a client interface to ease testing of the client code.
 type ApiClient interface {
 	Header() http.Header
 	Call(url string, body interface{}, response interface{}) error
 }
 
-// Client is a SensorPush client
+// Client is a SensorPush API client
 type Client struct {
 	email       string
 	password    string
@@ -26,7 +27,7 @@ type Client struct {
 
 const apiBase = "https://api.sensorpush.com/api/v1/"
 
-// NewClient creates a new SensorPush client
+// NewClient creates a new SensorPush client.
 func NewClient(email string, password string) (*Client, error) {
 	client, err := jsonapi.NewClient(apiBase)
 	if err != nil {
@@ -36,7 +37,8 @@ func NewClient(email string, password string) (*Client, error) {
 	return NewClientWithApiClient(email, password, client)
 }
 
-// NewClientWithApiClient creates a new SensorPush client
+// NewClientWithApiClient creates a new SensorPush client, seeded with a
+// (most-likely mocked) client API.
 func NewClientWithApiClient(email string, password string, client ApiClient) (*Client, error) {
 	return &Client{
 		email:    email,

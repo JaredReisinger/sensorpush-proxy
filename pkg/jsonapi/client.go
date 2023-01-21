@@ -9,7 +9,8 @@ import (
 	"time"
 )
 
-// Wraps http.Client in an interface so that we can mock it for testing.
+// HTTPRequestDoer wraps [http.Client] in an interface so that we can mock it
+// for testing.
 type HTTPRequestDoer interface {
 	Do(req *http.Request) (*http.Response, error)
 }
@@ -23,14 +24,14 @@ type Client struct {
 	header http.Header
 }
 
-// NewClient creates a new JSONAPIClient.
+// NewClient creates a new [Client].
 func NewClient(baseURL string) (*Client, error) {
 	return NewClientWithDoer(baseURL, &http.Client{
 		Timeout: 10 * time.Second,
 	})
 }
 
-// NewClientWithDoer creates a new JSONAPIClient with a specific request doer.
+// NewClientWithDoer creates a new [Client] with a specific [HTTPRequestDoer].
 func NewClientWithDoer(baseURL string, requestDoer HTTPRequestDoer) (*Client, error) {
 	// sanity-check the baseURL?
 	url, err := url.Parse(baseURL)
@@ -47,13 +48,14 @@ func NewClientWithDoer(baseURL string, requestDoer HTTPRequestDoer) (*Client, er
 	}, nil
 }
 
+// Header provides access to the [Client]'s [http.Header] values.
 func (c *Client) Header() http.Header {
 	return c.header
 }
 
 // auto-unmarshal error bodies?
 
-// Call makes a call!
+// Call makes a call (HTTP POST) to the API.
 func (c *Client) Call(relURL string, body interface{}, response interface{}) error {
 	// calculate API endpoint...
 	url, err := c.base.Parse(relURL)

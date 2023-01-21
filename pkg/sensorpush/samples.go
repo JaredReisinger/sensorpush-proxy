@@ -16,7 +16,7 @@ type samplesRequest struct {
 	StopTime  *time.Time `json:"stopTime,omitempty"`
 }
 
-// Sample is a single sensor reading
+// Sample is a single sensor reading.
 type Sample struct {
 	Altitude           float32   `json:"altitude"`
 	BarometricPressure float32   `json:"barometric_pressure"`

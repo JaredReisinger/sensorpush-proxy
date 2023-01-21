@@ -6,7 +6,7 @@ import (
 
 type gatewaysRequest struct{}
 
-// Gateway is a single gateway descriptor
+// Gateway is a single gateway descriptor.
 type Gateway struct {
 	LastAlert string `json:"last_alert"`
 	LastSeen  string `json:"last_seen"`
@@ -19,9 +19,10 @@ type Gateway struct {
 	ID      string `json:"id"`
 }
 
+// Gateways is a map of gateway descriptors, keyed by gateway ID.
 type Gateways map[string]Gateway
 
-// Gateways gets a list of gateways
+// Gateways gets a list of gateways.
 func (c *Client) Gateways() (*Gateways, error) {
 	gateways := &Gateways{}
 	err := c.authCall("devices/gateways", &gatewaysRequest{}, gateways, 0)
@@ -30,7 +31,6 @@ func (c *Client) Gateways() (*Gateways, error) {
 		return nil, err
 	}
 
-	// TODO: parse the response...
 	// log.Printf("gateways: %+v", gateways)
 	return gateways, nil
 }

@@ -6,7 +6,7 @@ import (
 
 type sensorsRequest struct{}
 
-// Sensor is a single sensor descriptor
+// Sensor is a single sensor descriptor.
 type Sensor struct {
 	Active  bool   `json:"active"`
 	Address string `json:"address"`
@@ -21,6 +21,7 @@ type Sensor struct {
 	Type string `json:"type"`
 }
 
+// Sensors is a map of sensor descriptors, keyed by sensor device ID.
 type Sensors map[string]Sensor
 
 // Sensors gets a list of sensors
@@ -32,7 +33,6 @@ func (c *Client) Sensors() (*Sensors, error) {
 		return nil, err
 	}
 
-	// TODO: parse the response...
 	// log.Printf("sensors: %+v", sensors)
 	return sensors, nil
 }
