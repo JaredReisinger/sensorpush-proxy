@@ -21,4 +21,5 @@
 /coverage/
 
 config.yaml
+.sensorpush-proxy.*
 

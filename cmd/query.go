@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 
+	"github.com/jaredreisinger/asp"
 	"github.com/jaredreisinger/sensorpush-proxy/pkg/sensorpush"
 	"github.com/spf13/cobra"
 )
@@ -18,12 +19,14 @@ var queryCmd = &cobra.Command{
 }
 
 func query(cmd *cobra.Command, args []string) {
-	config := getConfig(cmd)
-	// log.Printf("got config: %#v", config)
+	a := cmd.Context().Value(asp.ContextKey).(asp.Asp[RootConfig])
+	cfg := a.Config()
+	// cfg := getRootConfig(cmd)
+	// log.Printf("got config: %#v", cfg)
 
 	// TODO: check flags!
 
-	client, err := sensorpush.NewClient(config.SensorPush.Username, config.SensorPush.Password)
+	client, err := sensorpush.NewClient(cfg.SensorPush.Username, cfg.SensorPush.Password)
 	if err != nil {
 		log.Fatalf("unable to create client: %+v", err)
 	}

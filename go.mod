@@ -1,11 +1,11 @@
 module github.com/jaredreisinger/sensorpush-proxy
 
-go 1.18
+go 1.19
 
 require (
 	github.com/automation-co/husky v0.2.16
 	github.com/conventionalcommit/commitlint v0.10.0
-	github.com/jaredreisinger/asp v0.0.2
+	github.com/jaredreisinger/asp v0.1.0
 	github.com/lintingzhen/commitizen-go v1.0.3
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.1

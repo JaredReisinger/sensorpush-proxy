@@ -41,7 +41,8 @@ tasks:
     cmds:
       - go get
       - go generate -v
-      - go build -ldflags '-d -s -w' -tags netgo -o {{.BUILD_DIR}}/{{.APP_EXE}} .
+      - go build -ldflags '-d -s -w -X main.version=x.y.z -X main.commit=1234567890 -X main.date=now' -tags netgo -o {{.BUILD_DIR}}/{{.APP_EXE}} .
+
 
   coveragedir:
     desc: Create coverage directory

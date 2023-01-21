@@ -16,6 +16,9 @@ A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensor
     - [Get sensorpush-proxy](#get-sensorpush-proxy)
     - [Discover sensor IDs](#discover-sensor-ids)
     - [Figure out your desired configuration and run the proxy](#figure-out-your-desired-configuration-and-run-the-proxy)
+        - [As command-line flags](#as-command-line-flags)
+        - [As environment variables](#as-environment-variables)
+        - [As a config file](#as-a-config-file)
 - [Background](#background)
 
 <!-- /TOC -->
@@ -69,7 +72,7 @@ _(Shown here across multiple lines for readability...)_
 ```
 sensorpush-proxy proxy \
   --username YOUR_SENSORPUSH_USERNAME --password YOUR_SENSORPUSH_PASSWORD \
-  --device-ids inside=123456.67834768348756683478,outside=135678.0934908340980985858
+  --sensors inside=123456.67834768348756683478,outside=135678.0934908340980985858
 ```
 
 #### As environment variables
@@ -77,7 +80,7 @@ sensorpush-proxy proxy \
 ```
 export SPP_SENSORPUSH_USERNAME=YOUR_SENSORPUSH_USERNAME
 export SPP_SENSORPUSH_PASSWORD=YOUR_SENSORPUSH_PASSWORD
-export SPP_PROXY_DEVICEIDS=inside=123456.67834768348756683478,outside=135678.0934908340980985858
+export SPP_PROXY_SENSORS=inside=123456.67834768348756683478,outside=135678.0934908340980985858
 
 sensorpush-proxy proxy
 ```
@@ -92,7 +95,7 @@ sensorPush:
   password: YOUR_SENSORPUSH_PASSWORD
 
 proxy:
-  deviceIds:
+  sensors:
     inside: "123456.67834768348756683478"
     outside: "135678.0934908340980985858"
 ```

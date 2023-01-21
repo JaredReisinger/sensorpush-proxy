@@ -10,13 +10,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jaredreisinger/asp"
 	"github.com/jaredreisinger/sensorpush-proxy/pkg/sensorpush"
 	"github.com/spf13/cobra"
 )
-
-func init() {
-	rootCmd.AddCommand(proxyCmd)
-}
 
 var proxyCmd = &cobra.Command{
 	Use:   "proxy",
@@ -24,16 +21,44 @@ var proxyCmd = &cobra.Command{
 	Run:   proxy,
 }
 
+// proxyConfig is the configuration for the HTTP proxy that sensorpush-proxy
+// provides.
+type proxyConfig struct {
+	Port         string            `asp:"port,p,,port for the proxy to listen on"`
+	Sensors      map[string]string `asp:"sensors,s,,sensors to proxy; use 'symbolicName=id,otherName=another-id'\nstyle formatting for the values"`
+	UpdatePeriod time.Duration     `asp:"update-period,u,,duration between updates"`
+}
+
+type proxyCmdConfig struct {
+	RootConfig `mapstructure:",squash"`
+	Proxy      proxyConfig
+}
+
+var proxyDefaults = proxyCmdConfig{
+	Proxy: proxyConfig{
+		Port:         ":5375",
+		UpdatePeriod: 5 * time.Minute,
+	},
+}
+
+func init() {
+	a, err := asp.Attach(proxyCmd, proxyDefaults, aspOptions...)
+	cobra.CheckErr(err)
+	proxyCmd.SetContext(context.WithValue(context.Background(), asp.ContextKey, a))
+
+	rootCmd.AddCommand(proxyCmd)
+}
+
 func proxy(cmd *cobra.Command, args []string) {
-	config := getConfig(cmd)
-	// log.Printf("got config: %#v", config)
+	a := cmd.Context().Value(asp.ContextKey).(asp.Asp[proxyCmdConfig])
+	cfg := a.Config()
+	// log.Printf("got config: %#v", cfg)
 
-	user := config.SensorPush.Username
-	pass := config.SensorPush.Password
-	port := config.Proxy.Port
-	deviceIDs := config.Proxy.DeviceIDs
-
-	// TODO: check flags!
+	user := cfg.SensorPush.Username
+	pass := cfg.SensorPush.Password
+	port := cfg.Proxy.Port
+	sensors := cfg.Proxy.Sensors
+	updatePeriod := cfg.Proxy.UpdatePeriod
 
 	// ensure port has a ":" prefix?...
 	if !strings.HasPrefix(port, ":") {
@@ -46,21 +71,21 @@ func proxy(cmd *cobra.Command, args []string) {
 	}
 
 	// TODO: should lastSamples/SuccessfulCall really be channels?  We don't
-	// really want to server/read from them *while* updates are happening...
-	lastSamples := make(map[string]sensorpush.Sample, len(deviceIDs))
+	// really want to serve/read from them *while* updates are happening...
+	lastSamples := make(map[string]sensorpush.Sample, len(sensors))
 	lastSuccessfulCall := time.Now()
 
 	appCtx, appCancel := context.WithCancel(context.Background())
 
 	updater := func() {
-		for key, id := range deviceIDs {
+		for key, id := range sensors {
 			// log.Printf("getting last sample for %q...", key)
 			sample, err := client.LastSample(id)
 			if err != nil {
 				log.Printf("unable to get sample for %q: %+v", key, err)
-				// if we're X? past the last successful call, it's time to cancel
-				// and exit, and let a new process/container start up
-				if time.Since(lastSuccessfulCall) > (5 * time.Minute) {
+				// if we're 5 times past the last successful call, it's time to
+				// cancel and exit, and let a new process/container start up
+				if time.Since(lastSuccessfulCall) > (5 * updatePeriod) {
 					appCancel()
 				}
 			} else {
@@ -77,7 +102,7 @@ func proxy(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	runBackground(appCtx, updater, time.Minute)
+	runBackground(appCtx, updater, updatePeriod)
 
 	// Now spin up a web server to serve the sample data...
 	http.HandleFunc("/sensors", func(w http.ResponseWriter, req *http.Request) {

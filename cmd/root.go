@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -13,24 +12,16 @@ import (
 
 // SensorPushAuth is the authentication information needed for SensorPush.
 type SensorPushAuth struct {
-	Username string `asp.long:"username" asp.short:"u"`
-	Password string `asp.long:"password" asp.short:"p"`
+	Username string `asp:"username,,,password for SensorPush"`
+	Password string `asp:"password,,,username for SensorPush"`
 }
 
-// ProxyConfig is the configuration for the HTTP proxy that sensorpush-proxy
-// provides.
-type ProxyConfig struct {
-	Port      string            `asp.long:"port"`
-	DeviceIDs map[string]string `asp.long:"device-ids" asp.desc:"sets the Proxy.DeviceIDs value, which provides symbolic names for\nthe device IDs to fetch and return. Use\n  symbolicName=numeric-device-id,otherName=another-id\nstyle formatting for the values"`
-}
-
-// Config is the all-up configuration for sensorpush-proxy.
-type Config struct {
+// RootConfig is the root-level only config (common for all subcommands)
+type RootConfig struct {
 	SensorPush struct {
+		// in case we want to add more SensorPush config?
 		SensorPushAuth `mapstructure:",squash"`
 	}
-
-	Proxy ProxyConfig
 }
 
 var rootCmd = &cobra.Command{
@@ -39,37 +30,53 @@ var rootCmd = &cobra.Command{
 	// Long: "",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		// Do Stuff Here
-		config := getConfig(cmd)
-		log.Printf("got config: %#v", config)
+		a := cmd.Context().Value(asp.ContextKey).(asp.Asp[RootConfig])
+		// cfg := a.Config()
+		// log.Printf("got config: %#v", cfg)
+		a.Command().Help()
 	},
 }
 
-var configDefaults = Config{
-	Proxy: ProxyConfig{
-		Port: ":5375",
-	},
+var rootDefaults = RootConfig{}
+
+// provided by main!
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
+func SetVars(versionX string, commitX string, dateX string) {
+	// log.Printf()
+	version = versionX
+	commit = commitX
+	date = dateX
+
+	rootCmd.Version = fmt.Sprintf("%s (%.7s : %s)", version, commit, date)
 }
 
-// func SetVars(version string, commit string, date string) {
-// 	log.Printf()
-// }
+var aspOptions = []asp.Option{
+	asp.WithEnvPrefix("SPP_"),
+	asp.WithDefaultConfigName(".sensorpush-proxy"),
+}
 
 // Execute is the main entrypoint into the sensorpush-proxy CLI.
 func Execute() {
-	a, err := asp.Attach(rootCmd, configDefaults, asp.WithEnvPrefix[Config]("SPP_"))
+	// The cobra docs show the flags getting set in init() (pre-Execute), and a
+	// cobra.OnInitialize() handler to manage any config file (which is called
+	// by cobra prior to each/any command's Execute() call).  Each subcommand
+	// *could* have distinct config/flags... I need to think about how that
+	// ought to be represented.  It would be great if the env prefix and/or
+	// config file name persisted to the subcommands by default.
+	a, err := asp.Attach(rootCmd, rootDefaults, aspOptions...)
 	cobra.CheckErr(err)
 
-	ctx := context.WithValue(context.Background(), asp.ContextKey, a)
+	// ctx := context.WithValue(context.Background(), asp.ContextKey, a)
+	rootCmd.SetContext(context.WithValue(context.Background(), asp.ContextKey, a))
 
-	if err := rootCmd.ExecuteContext(ctx); err != nil {
+	// if err := rootCmd.ExecuteContext(ctx); err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-}
-
-func getConfig(cmd *cobra.Command) *Config {
-	a := cmd.Context().Value(asp.ContextKey).(asp.Asp[Config])
-	config := a.Config()
-	return config
 }
