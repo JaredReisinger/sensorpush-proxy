@@ -132,7 +132,7 @@ func proxy(cmd *cobra.Command, args []string) {
 	shutdownContext, shutdownComplete := context.WithCancel(context.Background())
 	go func() {
 		<-appCtx.Done()
-		log.Print("recieved signal to cancel/shutdown app")
+		log.Print("received signal to cancel/shutdown app")
 		ctx2, cancel := context.WithTimeout(shutdownContext, 10*time.Second)
 		defer cancel()
 		err := srv.Shutdown(ctx2)
@@ -162,7 +162,7 @@ func runBackground(ctx context.Context, f func(), duration time.Duration) {
 				f()
 
 			case <-ctx.Done():
-				log.Print("recieved signal to cancel/shutdown background")
+				log.Print("received signal to cancel/shutdown background")
 				ticker.Stop()
 				return
 			}

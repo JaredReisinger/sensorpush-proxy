@@ -1,4 +1,4 @@
-![sensorpush-proxy](./docs/sensorpush-proxy-logo.png)
+![sensorpush-proxy](https://raw.githubusercontent.com/JaredReisinger/sensorpush-proxy/main/docs/sensorpush-proxy-logo.png)
 
 A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensorpush.com) data.
 
@@ -8,7 +8,6 @@ A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensor
 [![Codecov](https://img.shields.io/codecov/c/github/jaredreisinger/sensorpush-proxy?logo=codecov&label=codedov)](https://codecov.io/gh/JaredReisinger/sensorpush-proxy)
 [![Go Report Card](https://goreportcard.com/badge/jaredreisinger/sensorpush-proxy)](https://goreportcard.com/report/github.com/jaredreisinger/sensorpush-proxy)
 [![License](https://img.shields.io/github/license/jaredreisinger/sensorpush-proxy)](https://github.com/JaredReisinger/sensorpush-proxy/blob/main/LICENSE)
-
 
 <!-- TOC -->
 
@@ -26,9 +25,7 @@ A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensor
 
 ## Usage
 
-More than likely, you’ll want to use the already-built [Docker image](https://hub.docker.com/r/jaredreisinger/sensorpush-proxy) for this, so that you can just throw your credentials and sensor config at it and let it run behind something like Traefik or nginx. Regardless of whether you use Docker or the raw binary, `sensorpush-proxy` includes both the proxy itself and also a `query` sub-command to help you discover the sensor IDs available to you.
-
-> _See [`docs/docker.md`](./docs/docker.md) for the Docker usage documentation._
+> _For non-Docker usage, [see the main README](https://github.com/JaredReisinger/sensorpush-proxy#README)._
 
 ### Get SensorPush credentials
 
@@ -36,16 +33,21 @@ If you have any SensorPush devices, you ought to already have an account with Se
 
 ### Get sensorpush-proxy
 
-Grab a binary distribution for your platform from [the releases page](https://github.com/JaredReisinger/sensorpush-proxy/releases). You can also build from source, in which case you may want to take a look at the [CONTRIBUTING](./CONTRIBUTING.md) documentation for more about the tooling and expected process.
+Use `docker pull jaredreisinger/sensorpush-proxy` to retrieve the Docker image.
 
-> _If you want the Docker image, see [`docs/docker.md`](./docs/docker.md)._
+> _**NOTE:** Version 0.1.0 of the Docker image (the current latest version) does **not** include an SSL certificates, which means that you will more than likely see certificate failures when you attempt to use the `query` or `proxy` sub-commands.  For now, bind-mount the host's `/etc/ssl/certs` directory into the container, or build a new image that includes these files.  I'm working on a fix that will ensure the standard CA root certs are included in the default image._
+
 
 ### Discover sensor IDs
 
-Use the `query` subcommand with your SensorPush credentials to discover the sensor IDs available to you:
+Use the `query` subcommand with your SensorPush credentials to discover the sensor IDs available to you.  _(Shown here across multiple lines for readability...)_
+
 
 ```
-sensorpush-proxy query --username YOUR_SENSORPUSH_USERNAME --password YOUR_SENSORPUSH_PASSWORD
+docker run --rm -ti \
+  -v /etc/ssl/certs:/etc/ssl/certs \
+  jaredreisinger/sensorpush-proxy \
+  query --username YOUR_SENSORPUSH_USERNAME --password YOUR_SENSORPUSH_PASSWORD
 ```
 
 You should see as output several log lines that show the name, ID, and type of the sensors on your account _(IDs shown below are not real!)_:
@@ -73,19 +75,25 @@ Given the above example, let’s assume that we want to proxy the “Kitchen” 
 _(Shown here across multiple lines for readability...)_
 
 ```
-sensorpush-proxy proxy \
-  --username YOUR_SENSORPUSH_USERNAME --password YOUR_SENSORPUSH_PASSWORD \
-  --sensors inside=123456.67834768348756683478,outside=135678.0934908340980985858
+docker run --rm -ti \
+  -v /etc/ssl/certs:/etc/ssl/certs \
+  jaredreisinger/sensorpush-proxy \
+  proxy \
+    --username YOUR_SENSORPUSH_USERNAME \
+    --password YOUR_SENSORPUSH_PASSWORD \
+    --sensors inside=123456.67834768348756683478,outside=135678.0934908340980985858
 ```
 
 #### As environment variables
 
 ```
-export SPP_SENSORPUSH_USERNAME=YOUR_SENSORPUSH_USERNAME
-export SPP_SENSORPUSH_PASSWORD=YOUR_SENSORPUSH_PASSWORD
-export SPP_PROXY_SENSORS=inside=123456.67834768348756683478,outside=135678.0934908340980985858
-
-sensorpush-proxy proxy
+docker run --rm -ti \
+  -v /etc/ssl/certs:/etc/ssl/certs \
+  -e SPP_SENSORPUSH_USERNAME=YOUR_SENSORPUSH_USERNAME \
+  -e SPP_SENSORPUSH_PASSWORD=YOUR_SENSORPUSH_PASSWORD \
+  -e SPP_PROXY_SENSORS=inside=123456.67834768348756683478,outside=135678.0934908340980985858 \
+  jaredreisinger/sensorpush-proxy \
+  proxy
 ```
 
 #### As a config file
@@ -104,9 +112,14 @@ proxy:
 ```
 
 ```
-sensorpush-proxy proxy --config ./config.yaml
+docker run --rm -ti \
+  -v /etc/ssl/certs:/etc/ssl/certs \
+  -v ${PWD}:/tmp
+  jaredreisinger/sensorpush-proxy \
+  proxy \
+    --config /tmp/config.yaml
 ```
 
 ## Background
 
-For further details, peruse the [background](./docs/background.md) and/or other documentation in the [`docs` folder](./docs/).
+For further details, peruse the [background](https://github.com/JaredReisinger/sensorpush-proxy/tree/main/docs/background.md) and/or other documentation in the [`docs` folder](https://github.com/JaredReisinger/sensorpush-proxy/tree/main/docs).
