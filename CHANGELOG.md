@@ -3,13 +3,6 @@
 _All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines._
 
 
-## [0.1.1](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.1.0...v0.1.1) (2023-01-25)
-
-
-### Bug Fixes
-
-* add CA certs to Docker image ([a6cf8be](https://github.com/JaredReisinger/sensorpush-proxy/commit/a6cf8befb73968d3af7ebf8bc768988abaca2019))
-
 # [0.1.0](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.0.7...v0.1.0) (2023-01-21)
 
 
