@@ -34,10 +34,18 @@ tasks:
       - rm -rf {{.COVERAGE_DIR}}
       - rm -rf .task
 
+  builddir:
+    cmds:
+      - mkdir {{.BUILD_DIR}}
+    status:
+      - test -d {{.BUILD_DIR}}
+
   build:
     desc: Builds the {{.APP_NAME}} binary
     sources:
       - ./**/*.go
+    deps:
+      - builddir
     cmds:
       - go get
       - go generate -v
@@ -122,7 +130,16 @@ tasks:
     cmds:
       - http -v :{{.APP_PORT}}/sensors
 
+  cacerts:
+    desc: Retrieve the CA cert bundle
+    deps:
+      - builddir
+    cmds:
+      - curl --etag-compare {{.BUILD_DIR}}/etag.txt --etag-save {{.BUILD_DIR}}/etag.txt --output {{.BUILD_DIR}}/cacert.pem https://curl.se/ca/cacert.pem
+
   release:
     desc: Run a snapshot (test) release
+    deps:
+      - cacerts
     cmds:
       - goreleaser release --snapshot --rm-dist

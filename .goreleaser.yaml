@@ -22,6 +22,8 @@ dockers:
     build_flag_templates:
       - --platform=linux/amd64
     # skip_push: true
+    extra_files:
+      - build/cacert.pem
 
   - image_templates:
       - "jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64"
@@ -30,6 +32,8 @@ dockers:
     build_flag_templates:
       - --platform=linux/arm64
     # skip_push: true
+    extra_files:
+      - build/cacert.pem
 
 # single-platform docker images can easily have multiple tags, but doing the
 # same for multi-platform manifests is a bit tricker.

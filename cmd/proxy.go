@@ -74,6 +74,7 @@ func proxy(cmd *cobra.Command, args []string) {
 	// really want to serve/read from them *while* updates are happening...
 	lastSamples := make(map[string]sensorpush.Sample, len(sensors))
 	lastSuccessfulCall := time.Now()
+	// mutex := &sync.Mutex{}
 
 	appCtx, appCancel := context.WithCancel(context.Background())
 

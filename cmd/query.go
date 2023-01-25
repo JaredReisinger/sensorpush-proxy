@@ -21,41 +21,35 @@ var queryCmd = &cobra.Command{
 func query(cmd *cobra.Command, args []string) {
 	a := cmd.Context().Value(asp.ContextKey).(asp.Asp[RootConfig])
 	cfg := a.Config()
-	// cfg := getRootConfig(cmd)
-	// log.Printf("got config: %#v", cfg)
-
-	// TODO: check flags!
 
 	client, err := sensorpush.NewClient(cfg.SensorPush.Username, cfg.SensorPush.Password)
 	if err != nil {
 		log.Fatalf("unable to create client: %+v", err)
 	}
 
-	// TODO: should lastSample/SuccessfulCall really be channels?  We don't
-	// really want to server/read from them *while* updates are happening...
-	// var lastSample sensorpush.Sample
-	// lastSuccessfulCall := time.Now()
-
-	// appCtx, appCancel := context.WithCancel(context.Background())
-
 	gateways, err := client.Gateways()
 	if err != nil {
 		log.Printf("unable to get gateways: %+v", err)
 	}
 
-	log.Printf("got gateways: %+v", gateways)
+	log.Print("Gateways")
+	for _, gateway := range *gateways {
+		log.Printf("  %s", gateway.Name)
+		log.Printf("    ID  : %q", gateway.ID)
+		log.Printf("    Version: %s", gateway.Version)
+		log.Printf("    Paired: %t", gateway.Paired)
+	}
 
 	sensors, err := client.Sensors()
 	if err != nil {
 		log.Printf("unable to get sensors: %+v", err)
 	}
 
-	// log.Printf("got sensors: %+v", sensors)
-
+	log.Print("Sensors")
 	for _, sensor := range *sensors {
-		log.Printf("%s", sensor.Name)
-		log.Printf("  ID  : %q", sensor.ID)
-		log.Printf("  Type: %s", sensor.Type)
+		log.Printf("  %s", sensor.Name)
+		log.Printf("    ID  : %q", sensor.ID)
+		log.Printf("    Type: %s", sensor.Type)
 	}
 
 }

@@ -34,6 +34,7 @@ jobs:
         with:
           install-only: true
 
+
       - if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
         uses: docker/login-action@v2
         with:
@@ -42,6 +43,7 @@ jobs:
 
       - if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
         uses: cycjimmy/semantic-release-action@v3
+        id: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -49,6 +51,11 @@ jobs:
             @semantic-release/changelog
             @semantic-release/git
             @semantic-release/exec
+
+      # kick the Go package index with the new version
+      - if: ${{ steps.release.outputs.new_release_published == 'true' }}
+        run: |
+          curl https://proxy.golang.org/github.com/jaredreisinger/sensorpush-proxy/@v/${{ steps.release.outputs.new_release_git_tag }}.info
 
       - uses: act10ns/slack@v2
         if: always()

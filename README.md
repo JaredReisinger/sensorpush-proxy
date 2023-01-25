@@ -20,6 +20,7 @@ A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensor
         - [As command-line flags](#as-command-line-flags)
         - [As environment variables](#as-environment-variables)
         - [As a config file](#as-a-config-file)
+    - [Call the API](#call-the-api)
 - [Background](#background)
 
 <!-- /TOC -->
@@ -44,7 +45,7 @@ Grab a binary distribution for your platform from [the releases page](https://g
 
 Use the `query` subcommand with your SensorPush credentials to discover the sensor IDs available to you:
 
-```
+```sh
 sensorpush-proxy query --username YOUR_SENSORPUSH_USERNAME --password YOUR_SENSORPUSH_PASSWORD
 ```
 
@@ -72,7 +73,7 @@ Given the above example, let’s assume that we want to proxy the “Kitchen” 
 
 _(Shown here across multiple lines for readability...)_
 
-```
+```sh
 sensorpush-proxy proxy \
   --username YOUR_SENSORPUSH_USERNAME --password YOUR_SENSORPUSH_PASSWORD \
   --sensors inside=123456.67834768348756683478,outside=135678.0934908340980985858
@@ -80,7 +81,7 @@ sensorpush-proxy proxy \
 
 #### As environment variables
 
-```
+```sh
 export SPP_SENSORPUSH_USERNAME=YOUR_SENSORPUSH_USERNAME
 export SPP_SENSORPUSH_PASSWORD=YOUR_SENSORPUSH_PASSWORD
 export SPP_PROXY_SENSORS=inside=123456.67834768348756683478,outside=135678.0934908340980985858
@@ -92,7 +93,7 @@ sensorpush-proxy proxy
 
 _(in ./config.yaml, say)_
 
-```
+```yaml
 sensorPush:
   username: YOUR_SENSORPUSH_USERNAME
   password: YOUR_SENSORPUSH_PASSWORD
@@ -103,8 +104,39 @@ proxy:
     outside: "135678.0934908340980985858"
 ```
 
-```
+```sh
 sensorpush-proxy proxy --config ./config.yaml
+```
+
+### Call the API
+
+There is only one API endpoint exposed at present, `/sensors`, which returns a JSON object keyed by the sensor names from the configuration.  This example pipes through `jq` purely for prettier formatting:
+
+```sh
+curl http://localhost:5375/sensors | jq .
+```
+
+```json
+{
+  "inside": {
+    "altitude": 0,
+    "barometric_pressure": 0,
+    "dewpoint": 0,
+    "humidity": 60.8,
+    "observed": "2023-01-25T21:02:55Z",
+    "temperature": 64.4,
+    "vpd": 0
+  },
+  "outside": {
+    "altitude": 0,
+    "barometric_pressure": 0,
+    "dewpoint": 0,
+    "humidity": 56.2,
+    "observed": "2023-01-25T21:03:35Z",
+    "temperature": 50.1,
+    "vpd": 0
+  }
+}
 ```
 
 ## Background

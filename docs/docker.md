@@ -19,6 +19,7 @@ A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensor
         - [As command-line flags](#as-command-line-flags)
         - [As environment variables](#as-environment-variables)
         - [As a config file](#as-a-config-file)
+    - [Call the API](#call-the-api)
 - [Background](#background)
 
 <!-- /TOC -->
@@ -35,7 +36,9 @@ If you have any SensorPush devices, you ought to already have an account with Se
 
 Use `docker pull jaredreisinger/sensorpush-proxy` to retrieve the Docker image.
 
-> _**NOTE:** Version 0.1.0 of the Docker image (the current latest version) does **not** include an SSL certificates, which means that you will more than likely see certificate failures when you attempt to use the `query` or `proxy` sub-commands.  For now, bind-mount the host's `/etc/ssl/certs` directory into the container, or build a new image that includes these files.  I'm working on a fix that will ensure the standard CA root certs are included in the default image._
+> ~~_**NOTE:** Version 0.1.0 of the Docker image (the current latest version) does **not** include any SSL certificates, which means that you will more than likely see certificate failures when you attempt to use the `query` or `proxy` sub-commands.  For now, bind-mount the host's `/etc/ssl/certs` directory into the container, or build a new image that includes these files.  I'm working on a fix that will ensure the standard CA root certs are included in the default image._~~
+>
+> _**UPDATE:** This is fixed as of **v0.1.1**, but note that you can still bind-mount `/etc/ssl/certs` or build a new image if you encounter CA/certification issues._
 
 
 ### Discover sensor IDs
@@ -43,9 +46,8 @@ Use `docker pull jaredreisinger/sensorpush-proxy` to retrieve the Docker image.
 Use the `query` subcommand with your SensorPush credentials to discover the sensor IDs available to you.  _(Shown here across multiple lines for readability...)_
 
 
-```
+```sh
 docker run --rm -ti \
-  -v /etc/ssl/certs:/etc/ssl/certs \
   jaredreisinger/sensorpush-proxy \
   query --username YOUR_SENSORPUSH_USERNAME --password YOUR_SENSORPUSH_PASSWORD
 ```
@@ -74,9 +76,9 @@ Given the above example, let’s assume that we want to proxy the “Kitchen” 
 
 _(Shown here across multiple lines for readability...)_
 
-```
+```sh
 docker run --rm -ti \
-  -v /etc/ssl/certs:/etc/ssl/certs \
+  -p 5375:5375 \
   jaredreisinger/sensorpush-proxy \
   proxy \
     --username YOUR_SENSORPUSH_USERNAME \
@@ -86,9 +88,9 @@ docker run --rm -ti \
 
 #### As environment variables
 
-```
+```sh
 docker run --rm -ti \
-  -v /etc/ssl/certs:/etc/ssl/certs \
+  -p 5375:5375 \
   -e SPP_SENSORPUSH_USERNAME=YOUR_SENSORPUSH_USERNAME \
   -e SPP_SENSORPUSH_PASSWORD=YOUR_SENSORPUSH_PASSWORD \
   -e SPP_PROXY_SENSORS=inside=123456.67834768348756683478,outside=135678.0934908340980985858 \
@@ -100,7 +102,7 @@ docker run --rm -ti \
 
 _(in ./config.yaml, say)_
 
-```
+```yaml
 sensorPush:
   username: YOUR_SENSORPUSH_USERNAME
   password: YOUR_SENSORPUSH_PASSWORD
@@ -111,13 +113,44 @@ proxy:
     outside: "135678.0934908340980985858"
 ```
 
-```
+```sh
 docker run --rm -ti \
-  -v /etc/ssl/certs:/etc/ssl/certs \
   -v ${PWD}:/tmp
+  -p 5375:5375 \
   jaredreisinger/sensorpush-proxy \
   proxy \
     --config /tmp/config.yaml
+```
+
+### Call the API
+
+There is only one API endpoint exposed at present, `/sensors`, which returns a JSON object keyed by the sensor names from the configuration.  This example pipes through `jq` purely for prettier formatting:
+
+```sh
+curl http://localhost:5375/sensors | jq .
+```
+
+```json
+{
+  "inside": {
+    "altitude": 0,
+    "barometric_pressure": 0,
+    "dewpoint": 0,
+    "humidity": 60.8,
+    "observed": "2023-01-25T21:02:55Z",
+    "temperature": 64.4,
+    "vpd": 0
+  },
+  "outside": {
+    "altitude": 0,
+    "barometric_pressure": 0,
+    "dewpoint": 0,
+    "humidity": 56.2,
+    "observed": "2023-01-25T21:03:35Z",
+    "temperature": 50.1,
+    "vpd": 0
+  }
+}
 ```
 
 ## Background

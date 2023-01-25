@@ -17,4 +17,5 @@ EXPOSE 5375
 USER 1000:1000
 ENTRYPOINT [ "/sensorpush-proxy" ]
 
+COPY build/cacert.pem /etc/ssl/certs/cacert.pem
 COPY sensorpush-proxy /

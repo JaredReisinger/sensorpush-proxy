@@ -71,6 +71,35 @@
 //
 //	sensorpush-proxy proxy --config ./config.yaml
 //
+// ### Call the API
+//
+// There is only one API endpoint exposed at present, `/sensors`, which returns a JSON object keyed by the sensor names from the configuration.  This example pipes through `jq` purely for prettier formatting:
+//
+//	curl http://localhost:5375/sensors | jq .
+//
+// which results in:
+//
+//	{
+//	  "inside": {
+//	    "altitude": 0,
+//	    "barometric_pressure": 0,
+//	    "dewpoint": 0,
+//	    "humidity": 60.8,
+//	    "observed": "2023-01-25T21:02:55Z",
+//	    "temperature": 64.4,
+//	    "vpd": 0
+//	  },
+//	  "outside": {
+//	    "altitude": 0,
+//	    "barometric_pressure": 0,
+//	    "dewpoint": 0,
+//	    "humidity": 56.2,
+//	    "observed": "2023-01-25T21:03:35Z",
+//	    "temperature": 50.1,
+//	    "vpd": 0
+//	  }
+//	}
+//
 // ## Background
 //
 // For further details, peruse the [./docs/background.md] and/or other documentation in the [./docs] folder.
