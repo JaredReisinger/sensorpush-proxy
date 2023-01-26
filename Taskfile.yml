@@ -40,6 +40,12 @@ tasks:
     status:
       - test -d {{.BUILD_DIR}}
 
+  update:
+    desc: Updates all dependencies
+    cmds:
+      - go get -u ./...
+      - go mod tidy
+
   build:
     desc: Builds the {{.APP_NAME}} binary
     sources:
@@ -50,7 +56,6 @@ tasks:
       - go get
       - go generate -v
       - go build -ldflags '-d -s -w -X main.version=x.y.z -X main.commit=1234567890 -X main.date=now' -tags netgo -o {{.BUILD_DIR}}/{{.APP_EXE}} .
-
 
   coveragedir:
     desc: Create coverage directory
