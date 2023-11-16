@@ -3,6 +3,14 @@
 _All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines._
 
 
+## [0.1.3](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.1.2...v0.1.3) (2023-11-16)
+
+
+### Bug Fixes
+
+* safely read/write the cached sensor data ([07b6ae5](https://github.com/JaredReisinger/sensorpush-proxy/commit/07b6ae525be650bb3b06cc62544d8be25df587f6))
+* update asp package ([1955a14](https://github.com/JaredReisinger/sensorpush-proxy/commit/1955a149d35cb7649d9c7a041f481f1e43b3486a))
+
 ## [0.1.2](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.1.1...v0.1.2) (2023-01-26)
 
 
