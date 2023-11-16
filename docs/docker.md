@@ -26,7 +26,7 @@ A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensor
 
 ## Usage
 
-> _For non-Docker usage, [see the main README](https://github.com/JaredReisinger/sensorpush-proxy#README)._
+> _For non-Docker usage, [see the main README](https://github.com/JaredReisinger/sensorpush-proxy#readme)._
 
 ### Get SensorPush credentials
 
