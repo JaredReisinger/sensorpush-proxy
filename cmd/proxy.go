@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/jaredreisinger/asp"
@@ -74,18 +75,28 @@ func proxy(cmd *cobra.Command, args []string) {
 	// really want to serve/read from them *while* updates are happening...
 	lastSamples := make(map[string]sensorpush.Sample, len(sensors))
 	lastSuccessfulCall := time.Now()
-	// mutex := &sync.Mutex{}
+
+	// Maps are not safe for r/w concurrency:
+	// https://go.dev/blog/maps#concurrency
+	mutex := &sync.RWMutex{}
 
 	appCtx, appCancel := context.WithCancel(context.Background())
 
 	updater := func() {
+		// ensure updates happen with a write-lock!
+		mutex.Lock()
+		defer mutex.Unlock()
+
 		for key, id := range sensors {
 			// log.Printf("getting last sample for %q...", key)
 			sample, err := client.LastSample(id)
 			if err != nil {
 				log.Printf("unable to get sample for %q: %+v", key, err)
+
 				// if we're 5 times past the last successful call, it's time to
-				// cancel and exit, and let a new process/container start up
+				// cancel and exit, and let a new process/container start up...
+				// but to be fair, we don't really have an expectation that
+				// doing so will fix things, do we?
 				if time.Since(lastSuccessfulCall) > (5 * updatePeriod) {
 					appCancel()
 				}
@@ -105,6 +116,14 @@ func proxy(cmd *cobra.Command, args []string) {
 
 	runBackground(appCtx, updater, updatePeriod)
 
+	// Ensures we read/marshal the map safely, protected against an incoming
+	// update.
+	getSamplesJson := func() ([]byte, error) {
+		mutex.RLock()
+		defer mutex.RUnlock()
+
+		return json.Marshal(lastSamples)
+	}
 	// Now spin up a web server to serve the sample data...
 	http.HandleFunc("/sensors", func(w http.ResponseWriter, req *http.Request) {
 		// If there's an Origin header, send back Access-Control-Allow-Origin
@@ -112,7 +131,8 @@ func proxy(cmd *cobra.Command, args []string) {
 		if origin != "" {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		}
-		b, err := json.Marshal(lastSamples)
+
+		b, err := getSamplesJson()
 		if err != nil {
 			io.WriteString(w, "{ error: \"no data?\" }")
 			return
