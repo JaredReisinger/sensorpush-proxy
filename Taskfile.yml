@@ -85,12 +85,12 @@ tasks:
   query:
     desc: Runs the {{.TASK}} command directly from source
     cmds:
-      - go run main.go {{.TASK}}
+      - go run main.go {{.TASK}} {{.CLI_ARGS}}
 
   proxy:
     desc: Runs the {{.TASK}} command directly from source
     cmds:
-      - go run main.go {{.TASK}}
+      - go run main.go {{.TASK}} {{.CLI_ARGS}}
 
   docker:
     desc: Builds the {{.APP_NAME}} Docker image

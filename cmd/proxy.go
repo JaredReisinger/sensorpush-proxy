@@ -43,16 +43,17 @@ var proxyDefaults = proxyCmdConfig{
 }
 
 func init() {
-	a, err := asp.Attach(proxyCmd, proxyDefaults, aspOptions...)
+	err := asp.Attach(proxyCmd, proxyDefaults, aspOptions...)
 	cobra.CheckErr(err)
-	proxyCmd.SetContext(context.WithValue(context.Background(), asp.ContextKey, a))
 
 	rootCmd.AddCommand(proxyCmd)
 }
 
 func proxy(cmd *cobra.Command, args []string) {
-	a := cmd.Context().Value(asp.ContextKey).(asp.Asp[proxyCmdConfig])
-	cfg := a.Config()
+	cfg, err := asp.Get[proxyCmdConfig](cmd)
+	if err != nil {
+		log.Fatalf("unable to get config: %+v", err)
+	}
 	// log.Printf("got config: %#v", cfg)
 
 	user := cfg.SensorPush.Username

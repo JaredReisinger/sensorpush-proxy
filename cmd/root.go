@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -68,11 +67,8 @@ func Execute() {
 	// *could* have distinct config/flags... I need to think about how that
 	// ought to be represented.  It would be great if the env prefix and/or
 	// config file name persisted to the subcommands by default.
-	a, err := asp.Attach(rootCmd, rootDefaults, aspOptions...)
+	err := asp.Attach(rootCmd, rootDefaults, aspOptions...)
 	cobra.CheckErr(err)
-
-	// ctx := context.WithValue(context.Background(), asp.ContextKey, a)
-	rootCmd.SetContext(context.WithValue(context.Background(), asp.ContextKey, a))
 
 	// if err := rootCmd.ExecuteContext(ctx); err != nil {
 	if err := rootCmd.Execute(); err != nil {

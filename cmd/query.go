@@ -19,8 +19,10 @@ var queryCmd = &cobra.Command{
 }
 
 func query(cmd *cobra.Command, args []string) {
-	a := cmd.Context().Value(asp.ContextKey).(asp.Asp[RootConfig])
-	cfg := a.Config()
+	cfg, err := asp.Get[RootConfig](cmd)
+	if err != nil {
+		log.Fatalf("unable to get config: %+v", err)
+	}
 
 	client, err := sensorpush.NewClient(cfg.SensorPush.Username, cfg.SensorPush.Password)
 	if err != nil {

@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/automation-co/husky v0.2.16
 	github.com/conventionalcommit/commitlint v0.10.0
-	github.com/jaredreisinger/asp v0.1.0
+	github.com/jaredreisinger/asp v0.2.0
 	github.com/lintingzhen/commitizen-go v1.0.3
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
