@@ -21,4 +21,4 @@ plugins:
     - publishCmd: |
         task cacerts
         echo "${nextRelease.notes}" > /tmp/release-notes.md
-        goreleaser release --release-notes /tmp/release-notes.md --rm-dist
+        goreleaser release --release-notes /tmp/release-notes.md --clean

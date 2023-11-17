@@ -147,4 +147,4 @@ tasks:
     deps:
       - cacerts
     cmds:
-      - goreleaser release --snapshot --rm-dist
+      - goreleaser release --snapshot --skip docker --clean

@@ -20,6 +20,7 @@
 /dist/
 /coverage/
 
+.env
 config.yaml
 .sensorpush-proxy.*
 
