@@ -3,6 +3,13 @@
 _All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines._
 
 
+## [0.1.7](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.1.6...v0.1.7) (2024-12-26)
+
+
+### Bug Fixes
+
+* ignore codecov-action files ([70470f1](https://github.com/JaredReisinger/sensorpush-proxy/commit/70470f1c2a9c82e92460b6c851424b26480c4483))
+
 ## [0.1.6](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.1.5...v0.1.6) (2024-12-26)
 
 
