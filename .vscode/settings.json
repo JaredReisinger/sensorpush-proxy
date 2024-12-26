@@ -5,6 +5,7 @@
       "jsonapi",
       "mapstructure",
       "sensorpush",
+      "stretchr",
       "Traefik"
     ]
 }

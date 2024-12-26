@@ -49,6 +49,20 @@ func init() {
 	rootCmd.AddCommand(proxyCmd)
 }
 
+// data and mutex
+var (
+	sensors      map[string]string
+	updatePeriod time.Duration
+
+	client             *sensorpush.Client
+	lastSamples        = make(map[string]sensorpush.Sample)
+	mutex              = &sync.RWMutex{} // maps are not safe for r/w concurrency
+	lastSuccessfulCall time.Time
+
+	appCtx    context.Context
+	appCancel context.CancelFunc
+)
+
 func proxy(cmd *cobra.Command, args []string) {
 	cfg, err := asp.Get[proxyCmdConfig](cmd)
 	if err != nil {
@@ -59,87 +73,30 @@ func proxy(cmd *cobra.Command, args []string) {
 	user := cfg.SensorPush.Username
 	pass := cfg.SensorPush.Password
 	port := cfg.Proxy.Port
-	sensors := cfg.Proxy.Sensors
-	updatePeriod := cfg.Proxy.UpdatePeriod
+	sensors = cfg.Proxy.Sensors
+	updatePeriod = cfg.Proxy.UpdatePeriod
 
 	// ensure port has a ":" prefix?...
 	if !strings.HasPrefix(port, ":") {
 		port = fmt.Sprintf(":%s", port)
 	}
 
-	client, err := sensorpush.NewClient(user, pass)
+	client, err = sensorpush.NewClient(user, pass)
 	if err != nil {
 		log.Fatalf("unable to create client: %+v", err)
 	}
 
 	// TODO: should lastSamples/SuccessfulCall really be channels?  We don't
 	// really want to serve/read from them *while* updates are happening...
-	lastSamples := make(map[string]sensorpush.Sample, len(sensors))
-	lastSuccessfulCall := time.Now()
+	lastSamples = make(map[string]sensorpush.Sample, len(sensors))
+	lastSuccessfulCall = time.Now()
 
-	// Maps are not safe for r/w concurrency:
-	// https://go.dev/blog/maps#concurrency
-	mutex := &sync.RWMutex{}
-
-	appCtx, appCancel := context.WithCancel(context.Background())
-
-	updater := func() {
-		// ensure updates happen with a write-lock!
-		mutex.Lock()
-		defer mutex.Unlock()
-
-		for key, id := range sensors {
-			// log.Printf("getting last sample for %q...", key)
-			sample, err := client.LastSample(id)
-			if err != nil {
-				log.Printf("unable to get sample for %q: %+v", key, err)
-
-				// if we're 5 times past the last successful call, it's time to
-				// cancel and exit, and let a new process/container start up...
-				// but to be fair, we don't really have an expectation that
-				// doing so will fix things, do we?
-				if time.Since(lastSuccessfulCall) > (5 * updatePeriod) {
-					appCancel()
-				}
-			} else {
-				log.Printf(
-					"UPDATER: %s: %.1f°F, %.1f%%RH (%s)",
-					sample.Observed.Local().Format(time.RFC3339),
-					sample.Temperature,
-					sample.Humidity,
-					key,
-				)
-				lastSamples[key] = *sample
-				lastSuccessfulCall = time.Now()
-			}
-		}
-	}
+	appCtx, appCancel = context.WithCancel(context.Background())
 
 	runBackground(appCtx, updater, updatePeriod)
 
-	// Ensures we read/marshal the map safely, protected against an incoming
-	// update.
-	getSamplesJson := func() ([]byte, error) {
-		mutex.RLock()
-		defer mutex.RUnlock()
-
-		return json.Marshal(lastSamples)
-	}
 	// Now spin up a web server to serve the sample data...
-	http.HandleFunc("/sensors", func(w http.ResponseWriter, req *http.Request) {
-		// If there's an Origin header, send back Access-Control-Allow-Origin
-		origin := req.Header.Get("Origin")
-		if origin != "" {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-		}
-
-		b, err := getSamplesJson()
-		if err != nil {
-			io.WriteString(w, "{ error: \"no data?\" }")
-			return
-		}
-		w.Write(b)
-	})
+	http.HandleFunc("/sensors", sensorsHandler)
 
 	srv := &http.Server{
 		Addr: port,
@@ -168,6 +125,64 @@ func proxy(cmd *cobra.Command, args []string) {
 	err = srv.ListenAndServe()
 	<-shutdownContext.Done()
 	log.Printf("exiting: %+v", err)
+}
+
+func sensorsHandler(w http.ResponseWriter, req *http.Request) {
+	// If there's an Origin header, send back Access-Control-Allow-Origin
+	origin := req.Header.Get("Origin")
+	if origin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	b, err := getSamplesJson()
+	if err != nil {
+		io.WriteString(w, "{ error: \"no data?\" }")
+		return
+	}
+	w.Write(b)
+}
+
+// Ensures we read/marshal the map safely, protected against an incoming
+// update.
+func getSamplesJson() ([]byte, error) {
+	mutex.RLock()
+	defer mutex.RUnlock()
+
+	return json.Marshal(lastSamples)
+}
+
+func updater() {
+	// ensure updates happen with a write-lock!
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	for key, id := range sensors {
+		// log.Printf("getting last sample for %q...", key)
+		sample, err := client.LastSample(id)
+		if err != nil {
+			log.Printf("unable to get sample for %q: %+v", key, err)
+
+			// if we're 5 times past the last successful call, it's time to
+			// cancel and exit, and let a new process/container start up...
+			// but to be fair, we don't really have an expectation that
+			// doing so will fix things, do we?
+			if time.Since(lastSuccessfulCall) > (5 * updatePeriod) {
+				appCancel()
+			}
+		} else {
+			log.Printf(
+				"UPDATER: %s: %.1f°F, %.1f%%RH (%s)",
+				sample.Observed.Local().Format(time.RFC3339),
+				sample.Temperature,
+				sample.Humidity,
+				key,
+			)
+			lastSamples[key] = *sample
+			lastSuccessfulCall = time.Now()
+		}
+	}
 }
 
 // Should this take context instead of returning a channel?
