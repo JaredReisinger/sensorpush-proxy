@@ -19,6 +19,8 @@
 /build/
 /dist/
 /coverage/
+codecov
+codecov.*
 
 .env
 config.yaml
