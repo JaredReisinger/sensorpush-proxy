@@ -3,6 +3,14 @@
 _All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines._
 
 
+## [0.1.5](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.1.4...v0.1.5) (2024-12-26)
+
+
+### Bug Fixes
+
+* send proper "Content-Type: application/json" header ([a1658bb](https://github.com/JaredReisinger/sensorpush-proxy/commit/a1658bb786b200804d3344165b5d0a0709aa359c))
+* update go version, dependencies ([609a15a](https://github.com/JaredReisinger/sensorpush-proxy/commit/609a15aa580c4de4b62b06228e1b0bd75fb49c93))
+
 ## [0.1.4](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.1.3...v0.1.4) (2023-11-17)
 
 
