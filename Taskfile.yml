@@ -142,6 +142,7 @@ tasks:
     preconditions:
       - sh: '[ "${CI}" == "true" ]'
     cmds:
+      # - goreleaser release --release-notes /tmp/release-notes.md --clean
       - goreleaser release --clean
 
   query:

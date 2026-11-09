@@ -69,11 +69,13 @@ snapshot:
   version_template: "{{ incpatch .Version }}-next"
 
 changelog:
+  disable: false
   sort: asc
   filters:
     exclude:
       - "^docs:"
       - "^test:"
+
 # The lines beneath this are called `modelines`. See `:help modeline`
 # Feel free to remove those if you don't want/use them.
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
