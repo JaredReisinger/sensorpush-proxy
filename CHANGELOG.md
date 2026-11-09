@@ -3,6 +3,14 @@
 _All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines._
 
 
+## [0.1.8](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.1.7...v0.1.8) (2026-11-09)
+
+
+### Bug Fixes
+
+* ensure new jaredreisinger/asp works; slight config tweaks ([d451944](https://github.com/JaredReisinger/sensorpush-proxy/commit/d45194487ec5fd211a4478d723926c569be0a1b4))
+* update dependencies ([821880d](https://github.com/JaredReisinger/sensorpush-proxy/commit/821880d7ed9ab2bf3ca74d836187dc082e9d1707))
+
 ## [0.1.7](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.1.6...v0.1.7) (2024-12-26)
 
 
