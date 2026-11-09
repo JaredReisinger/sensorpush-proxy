@@ -15,6 +15,7 @@
       "mapstructure",
       "netgo",
       "sensorpush",
+      "sigstore",
       "stretchr",
       "Traefik"
     ]

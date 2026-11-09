@@ -50,12 +50,11 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Check if release is needed
-        id: check-bump
-        run: |
-          go mod download
-          go tool task tag-release
-
+      # - name: Check if release is needed
+      #   id: check-bump
+      #   run: |
+      #     go mod download
+      #     go tool task tag-release
 
       - uses: goreleaser/goreleaser-action@v7
         with:
@@ -63,22 +62,29 @@ jobs:
 
       - uses: sigstore/cosign-installer@v4
 
+      - name: Set up signing keys
+        run: |
+          printf "%s" '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
+
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - uses: cycjimmy/semantic-release-action@v4
+      - uses: cycjimmy/semantic-release-action@v8
         id: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
         with:
           extra_plugins: |
             @semantic-release/changelog
             @semantic-release/git
             @semantic-release/exec
+
+      - if: always()
+        run: |
+          rm -f cosign.key
 
       # kick the Go package index with the new version
       - run: |

@@ -132,7 +132,8 @@ tasks:
       # "github.com/gobwas/glob" no longer has "syntax/ast" (as of v1.0) and
       # we're already dependent on v1.1; for now, "goreleaser", not "go tool
       # goreleaser"
-      - goreleaser release --clean --snapshot --skip=publish --skip=sign --skip=sbom {{.CLI_ARGS}}
+      - goreleaser release --clean --snapshot --skip=publish {{.CLI_ARGS}}
+      # - goreleaser release --clean --snapshot --skip=publish --skip=sign --skip=sbom {{.CLI_ARGS}}
 
   # note that release must be run with permissions to write to the
   # artifacts and releases of the repo
@@ -201,16 +202,16 @@ tasks:
     cmds:
       - http -v :{{.APP_PORT}}/sensors
 
-  cacerts:
-    desc: Retrieve the CA cert bundle
-    deps:
-      - builddir
-    cmds:
-      - curl --etag-compare {{.BUILD_DIR}}/etag.txt --etag-save {{.BUILD_DIR}}/etag.txt --output {{.BUILD_DIR}}/cacert.pem https://curl.se/ca/cacert.pem
+  # cacerts:
+  #   desc: Retrieve the CA cert bundle
+  #   deps:
+  #     - builddir
+  #   cmds:
+  #     - curl --etag-compare {{.BUILD_DIR}}/etag.txt --etag-save {{.BUILD_DIR}}/etag.txt --output {{.BUILD_DIR}}/cacert.pem https://curl.se/ca/cacert.pem
 
-  release:
-    desc: Run a snapshot (test) release
-    deps:
-      - cacerts
-    cmds:
-      - goreleaser release --snapshot --skip docker --clean
+  # release:
+  #   desc: Run a snapshot (test) release
+  #   deps:
+  #     - cacerts
+  #   cmds:
+  #     - goreleaser release --snapshot --skip docker --clean

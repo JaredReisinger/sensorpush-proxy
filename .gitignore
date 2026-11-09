@@ -22,7 +22,7 @@
 codecov
 codecov.*
 
-.env
-config.yaml
+.env*
+cosign.key
 .sensorpush-proxy.*
 

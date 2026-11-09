@@ -29,12 +29,13 @@ signs:
   # value would be in that case.  Bad docs!
   - cmd: cosign
     stdin: '{{ .Env.COSIGN_PASSWORD }}'
+    signature: "${artifact}.sigstore.json"
     args:
-      - "sign-blob"
-      - "--key=env://COSIGN_PRIVATE_KEY"
-      - "--output-signature=${signature}"
-      - "${artifact}"
-      - "--yes" # needed on cosign 2.0.0+
+      - sign-blob
+      - --key=cosign.key
+      - --bundle=${signature}
+      - ${artifact}
+      - --yes
     artifacts: all
 
 dockers_v2:
@@ -45,47 +46,6 @@ dockers_v2:
       - '{{ .Major }}.{{ .Minor }}'
       - '{{ .Major }}'
       - latest
-
-# dockers:
-#   - image_templates:
-#       - "jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64"
-#     use: buildx
-#     goarch: amd64
-#     build_flag_templates:
-#       - --platform=linux/amd64
-#     # skip_push: true
-#     extra_files:
-#       - build/cacert.pem
-
-#   - image_templates:
-#       - "jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64"
-#     use: buildx
-#     goarch: arm64
-#     build_flag_templates:
-#       - --platform=linux/arm64
-#     # skip_push: true
-#     extra_files:
-#       - build/cacert.pem
-
-# # single-platform docker images can easily have multiple tags, but doing the
-# # same for multi-platform manifests is a bit tricker.
-# docker_manifests:
-#   - name_template: jaredreisinger/sensorpush-proxy:{{ .Version }}
-#     image_templates:
-#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
-#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
-#   - name_template: jaredreisinger/sensorpush-proxy:{{ .Major }}.{{ .Minor }}
-#     image_templates:
-#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
-#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
-#   - name_template: jaredreisinger/sensorpush-proxy:{{ .Major }}
-#     image_templates:
-#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
-#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
-#   - name_template: jaredreisinger/sensorpush-proxy:latest
-#     image_templates:
-#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
-#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
 
 archives:
   - formats: tar.gz
