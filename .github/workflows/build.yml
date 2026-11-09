@@ -81,21 +81,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # - uses: cycjimmy/semantic-release-action@v8
-      #   id: release
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-      #   with:
-      #     extra_plugins: |
-      #       @semantic-release/changelog
-      #       @semantic-release/git
-      #       @semantic-release/exec
-
       - if: ${{ steps.check-bump.outputs.do_release == 'true' }}
         run: go tool task release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
       - if: always()
         run: |
