@@ -96,7 +96,6 @@ require (
 	github.com/huandu/xstrings v1.6.3 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/jandelgado/gcov2lcov v1.1.1 // indirect
 	github.com/jaredreisinger/committed v0.6.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.20.1 // indirect
@@ -177,7 +176,6 @@ tool (
 	github.com/caarlos0/svu/v3
 	github.com/conventionalcommit/commitlint
 	github.com/go-task/task/v3/cmd/task
-	github.com/jandelgado/gcov2lcov
 	github.com/jaredreisinger/committed
 	golang.org/x/vuln/cmd/govulncheck
 )
