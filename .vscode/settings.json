@@ -1,9 +1,16 @@
 {
     "cSpell.words": [
+      "cacerts",
+      "commitlint",
+      "coveragedir",
+      "coverprofile",
       "dewpoint",
       "gomod",
+      "goreleaser",
       "jsonapi",
+      "ldflags",
       "mapstructure",
+      "netgo",
       "sensorpush",
       "stretchr",
       "Traefik"

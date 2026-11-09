@@ -13,8 +13,8 @@ vars:
 
 tasks:
   default:
-    deps:
-      - build
+    cmds:
+      - go tool task --list
 
   # The git hooks initialization isn't quite as streamlined as in Node/npm,
   # where the package creator can "force install" the husky hooks during the
@@ -26,7 +26,11 @@ tasks:
     desc: One-time local repo setup
     cmds:
       - go mod download
-      - go run -v github.com/automation-co/husky install
+      - echo "setting up git hooks..."
+      - git config set --local core.hooksPath .hooks
+      - echo "setting up committed as this repo's commit editor..."
+      - git config set --local core.editor "go tool committed"
+      - echo "use 'git config unset --local core.editor' to undo"
 
   clean:
     desc: Clean project
