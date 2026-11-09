@@ -8,21 +8,28 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	rootCmd.AddCommand(queryCmd)
-}
-
 var queryCmd = &cobra.Command{
 	Use:   "query",
-	Short: "show all of the available device IDs for the user",
+	Short: "Show all of the available device IDs for the user",
 	Run:   query,
 }
 
+type queryConfig struct {
+}
+
+func init() {
+	err := asp.Attach(queryCmd, queryConfig{}, aspOptions...)
+	cobra.CheckErr(err)
+
+	rootCmd.AddCommand(queryCmd)
+}
+
 func query(cmd *cobra.Command, args []string) {
-	cfg, err := asp.Get[RootConfig](cmd)
+	cfg, err := asp.Get[rootConfig](cmd.Root())
 	if err != nil {
 		log.Fatalf("unable to get config: %+v", err)
 	}
+	// log.Printf("got config: %#v", cfg)
 
 	client, err := sensorpush.NewClient(cfg.SensorPush.Username, cfg.SensorPush.Password)
 	if err != nil {
@@ -53,5 +60,4 @@ func query(cmd *cobra.Command, args []string) {
 		log.Printf("    ID  : %q", sensor.ID)
 		log.Printf("    Type: %s", sensor.Type)
 	}
-
 }

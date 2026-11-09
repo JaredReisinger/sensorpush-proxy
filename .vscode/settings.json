@@ -1,10 +1,13 @@
 {
     "cSpell.words": [
+      "accesstoken",
+      "apikey",
       "cacerts",
       "commitlint",
       "coveragedir",
       "coverprofile",
       "dewpoint",
+      "dotenv",
       "gomod",
       "goreleaser",
       "jsonapi",

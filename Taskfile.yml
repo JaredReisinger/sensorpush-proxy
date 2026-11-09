@@ -1,5 +1,7 @@
 version: "3"
 
+dotenv: ['.env']
+
 vars:
   APP_NAME: sensorpush-proxy
   APP_EXE: "{{.APP_NAME}}{{exeExt}}"
@@ -72,34 +74,93 @@ tasks:
     desc: Runs all the tests
     deps:
       - coveragedir
+    vars:
+      COVERAGE_FILE: '{{.COVERAGE_DIR}}/coverage.out'
     cmds:
-      - go test -coverprofile {{.COVERAGE_DIR}}/cover.out ./...
-      - go tool cover -html {{.COVERAGE_DIR}}/cover.out -o {{.COVERAGE_DIR}}/coverage.html
+      - go test -coverprofile {{.COVERAGE_FILE}} ./...
+      - go tool cover -html {{.COVERAGE_FILE}} -o {{.COVERAGE_DIR}}/coverage.html
 
   lint:
     desc: Runs common checks/vet/linting
     cmds:
       - go fmt -n ./...
       - go vet ./...
+      - go tool govulncheck ./...
 
   pre-commit:
     cmds:
       - task: lint
 
+  tag-release:
+    desc: tags the next release if warranted (and on CI)
+    vars:
+      VER_CUR:
+        sh: go tool svu current
+      VER_NEXT:
+        sh: go tool svu next
+    cmds:
+      - cmd: echo "svu says {{.VER_CUR}} -> {{.VER_NEXT}}"
+        silent: true
+      - if: '{{ne .VER_NEXT .VER_CUR}}'
+        task: tag-release:ci
+        vars:
+          VERSION: '{{.VER_NEXT}}'
+      - if: '{{eq .VER_NEXT .VER_CUR}}'
+        cmd: echo "no new tag created"
+        silent: true
+
+  # note that tag-release:ci must be run with permissions to write to the
+  # contents of the repo
+  tag-release:ci:
+    internal: true
+    preconditions:
+      - sh: '[ "${CI}" == "true" ]'
+    requires:
+      vars: [ VERSION ]
+    cmds:
+      - git config user.name "github-actions[bot]"
+      - git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - git tag -a "{{.VERSION}}" -m "release {{.VERSION}}"
+      - git push --tags
+      - echo "do_release=true" >> "${GITHUB_OUTPUT}"
+      - echo "version={{.VERSION}}" >> "${GITHUB_OUTPUT}"
+
+  release:test:
+    desc: test the release process
+    cmds:
+      # "go get -tool github.com/goreleaser/goreleaser/v2" is failing because
+      # "github.com/gobwas/glob" no longer has "syntax/ast" (as of v1.0) and
+      # we're already dependent on v1.1; for now, "goreleaser", not "go tool
+      # goreleaser"
+      - goreleaser release --clean --snapshot --skip=publish --skip=sign --skip=sbom {{.CLI_ARGS}}
+
+  # note that release must be run with permissions to write to the
+  # artifacts and releases of the repo
+  release:
+    desc: actually release the tool
+    preconditions:
+      - sh: '[ "${CI}" == "true" ]'
+    cmds:
+      - goreleaser release --clean
+
   query:
     desc: Runs the {{.TASK}} command directly from source
     cmds:
-      - go run main.go {{.TASK}} {{.CLI_ARGS}}
+      - task: run
+        vars:
+          CMD_NAME: '{{.TASK}}'
 
   proxy:
     desc: Runs the {{.TASK}} command directly from source
     cmds:
-      - go run main.go {{.TASK}} {{.CLI_ARGS}}
+      - task: run
+        vars:
+          CMD_NAME: '{{.TASK}}'
 
-  docker:
-    desc: Builds the {{.APP_NAME}} Docker image
+  run:
+    desc: Runs the command directly from source
     cmds:
-      - docker build --file Dockerfile.old --tag {{.APP_NAME}}:local .
+      - go run . {{.CMD_NAME}} {{.CLI_ARGS}}
 
   docker-query:
     desc: Runs the {{ .TASK | replace "docker-" "" }} command via the Docker image
@@ -119,8 +180,9 @@ tasks:
   docker-run:
     internal: true
     cmds:
-      # if you have a local config.yaml, it will be mounted in the /tmp dir
-      - docker run --rm -ti -v {{.ROOT_DIR}}:/tmp --workdir /tmp {{.RUN_ARGS}} {{.APP_NAME}}:local {{.SPP_ARGS}}
+      # if you have a local config.yaml, it will be mounted in the /tmp dir;
+      # uses the goreleaser-built image
+      - docker run --rm -ti -v {{.ROOT_DIR}}:/tmp --workdir /tmp {{.RUN_ARGS}} jaredreisinger/{{.APP_NAME}}:latest-{{ARCH}} {{.SPP_ARGS}}
 
   docker-analyze:
     cmds:

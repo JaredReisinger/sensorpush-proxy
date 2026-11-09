@@ -2,9 +2,7 @@ version: 2
 
 before:
   hooks:
-    # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
     - go generate ./...
 
 # gomod/proxy to enable verifiable builds
@@ -39,49 +37,58 @@ signs:
       - "--yes" # needed on cosign 2.0.0+
     artifacts: all
 
-dockers:
-  - image_templates:
-      - "jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64"
-    use: buildx
-    goarch: amd64
-    build_flag_templates:
-      - --platform=linux/amd64
-    # skip_push: true
-    extra_files:
-      - build/cacert.pem
+dockers_v2:
+  - images:
+      - jaredreisinger/sensorpush-proxy
+    tags:
+      - '{{ .Version }}'
+      - '{{ .Major }}.{{ .Minor }}'
+      - '{{ .Major }}'
+      - latest
 
-  - image_templates:
-      - "jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64"
-    use: buildx
-    goarch: arm64
-    build_flag_templates:
-      - --platform=linux/arm64
-    # skip_push: true
-    extra_files:
-      - build/cacert.pem
+# dockers:
+#   - image_templates:
+#       - "jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64"
+#     use: buildx
+#     goarch: amd64
+#     build_flag_templates:
+#       - --platform=linux/amd64
+#     # skip_push: true
+#     extra_files:
+#       - build/cacert.pem
 
-# single-platform docker images can easily have multiple tags, but doing the
-# same for multi-platform manifests is a bit tricker.
-docker_manifests:
-  - name_template: jaredreisinger/sensorpush-proxy:{{ .Version }}
-    image_templates:
-      - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
-      - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
-  - name_template: jaredreisinger/sensorpush-proxy:{{ .Major }}.{{ .Minor }}
-    image_templates:
-      - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
-      - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
-  - name_template: jaredreisinger/sensorpush-proxy:{{ .Major }}
-    image_templates:
-      - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
-      - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
-  - name_template: jaredreisinger/sensorpush-proxy:latest
-    image_templates:
-      - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
-      - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
+#   - image_templates:
+#       - "jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64"
+#     use: buildx
+#     goarch: arm64
+#     build_flag_templates:
+#       - --platform=linux/arm64
+#     # skip_push: true
+#     extra_files:
+#       - build/cacert.pem
+
+# # single-platform docker images can easily have multiple tags, but doing the
+# # same for multi-platform manifests is a bit tricker.
+# docker_manifests:
+#   - name_template: jaredreisinger/sensorpush-proxy:{{ .Version }}
+#     image_templates:
+#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
+#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
+#   - name_template: jaredreisinger/sensorpush-proxy:{{ .Major }}.{{ .Minor }}
+#     image_templates:
+#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
+#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
+#   - name_template: jaredreisinger/sensorpush-proxy:{{ .Major }}
+#     image_templates:
+#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
+#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
+#   - name_template: jaredreisinger/sensorpush-proxy:latest
+#     image_templates:
+#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-amd64
+#       - jaredreisinger/sensorpush-proxy:{{ .Version }}-arm64
 
 archives:
-  - format: tar.gz
+  - formats: tar.gz
     # this name template makes the OS and Arch compatible with the results of uname.
     name_template: >-
       sensorpush-proxy_
@@ -93,7 +100,7 @@ archives:
     # use zip for windows archives
     format_overrides:
       - goos: windows
-        format: zip
+        formats: zip
 
 checksum:
   name_template: "checksums.txt"

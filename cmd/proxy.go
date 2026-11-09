@@ -18,25 +18,25 @@ import (
 
 var proxyCmd = &cobra.Command{
 	Use:   "proxy",
-	Short: "run a proxy server for specific device IDs",
+	Short: "Run a proxy server for specific device IDs",
 	Run:   proxy,
 }
 
 // proxyConfig is the configuration for the HTTP proxy that sensorpush-proxy
 // provides.
 type proxyConfig struct {
+	// Using a named sub-struct makes the config file better
+	Proxy ProxyConfig `asp.long:"" asp.env:""`
+}
+
+type ProxyConfig struct {
 	Port         string            `asp:"port,p,,port for the proxy to listen on"`
 	Sensors      map[string]string `asp:"sensors,s,,sensors to proxy; use 'symbolicName=id,otherName=another-id'\nstyle formatting for the values"`
 	UpdatePeriod time.Duration     `asp:"update-period,u,,duration between updates"`
 }
 
-type proxyCmdConfig struct {
-	RootConfig `mapstructure:",squash"`
-	Proxy      proxyConfig
-}
-
-var proxyDefaults = proxyCmdConfig{
-	Proxy: proxyConfig{
+var proxyDefaults = proxyConfig{
+	Proxy: ProxyConfig{
 		Port:         ":5375",
 		UpdatePeriod: 5 * time.Minute,
 	},
@@ -64,14 +64,20 @@ var (
 )
 
 func proxy(cmd *cobra.Command, args []string) {
-	cfg, err := asp.Get[proxyCmdConfig](cmd)
+	rootCfg, err := asp.Get[rootConfig](cmd.Root())
 	if err != nil {
 		log.Fatalf("unable to get config: %+v", err)
 	}
+	cfg, err := asp.Get[proxyConfig](cmd)
+	if err != nil {
+		log.Fatalf("unable to get config: %+v", err)
+	}
+
+	// log.Printf("got root config: %#v", rootCfg)
 	// log.Printf("got config: %#v", cfg)
 
-	user := cfg.SensorPush.Username
-	pass := cfg.SensorPush.Password
+	user := rootCfg.SensorPush.Username
+	pass := rootCfg.SensorPush.Password
 	port := cfg.Proxy.Port
 	sensors = cfg.Proxy.Sensors
 	updatePeriod = cfg.Proxy.UpdatePeriod

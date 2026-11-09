@@ -9,34 +9,36 @@ import (
 	"github.com/jaredreisinger/asp"
 )
 
-// SensorPushAuth is the authentication information needed for SensorPush.
-type SensorPushAuth struct {
-	Username string `asp:"username,,,password for SensorPush"`
-	Password string `asp:"password,,,username for SensorPush"`
+// rootConfig is the root-level only config (common for all subcommands)
+type rootConfig struct {
+	// Using a named sub-struct makes the config file better
+	SensorPush SensorPush `asp.long:""`
 }
 
-// RootConfig is the root-level only config (common for all subcommands)
-type RootConfig struct {
-	SensorPush struct {
-		// in case we want to add more SensorPush config?
-		SensorPushAuth `mapstructure:",squash"`
-	}
+type SensorPush struct {
+	Username string `asp:"username,,,username for SensorPush"`
+	Password string `asp:"password,,,password for SensorPush,true"`
 }
 
 var rootCmd = &cobra.Command{
 	Use: "sensorpush-proxy",
 	// Short: "",
-	// Long: "",
-
-	Run: func(cmd *cobra.Command, args []string) {
-		a := cmd.Context().Value(asp.ContextKey).(asp.Asp[RootConfig])
-		// cfg := a.Config()
-		// log.Printf("got config: %#v", cfg)
-		a.Command().Help()
-	},
+	Long: `
+A credential-hiding proxy for the SensorPush API. Intended to be used to help
+provide sensor data for frontend websites.
+`,
 }
 
-var rootDefaults = RootConfig{}
+var aspOptions = []asp.Option{
+	asp.WithEnvPrefix("SPP_"),
+	asp.WithDefaultConfigName(".sensorpush-proxy"),
+}
+
+func init() {
+	cobra.EnableTraverseRunHooks = true
+	err := asp.Attach(rootCmd, rootConfig{}, aspOptions...)
+	cobra.CheckErr(err)
+}
 
 // provided by main!
 var (
@@ -54,22 +56,8 @@ func SetVars(versionX string, commitX string, dateX string) {
 	rootCmd.Version = fmt.Sprintf("%s (%.7s : %s)", version, commit, date)
 }
 
-var aspOptions = []asp.Option{
-	asp.WithEnvPrefix("SPP_"),
-	asp.WithDefaultConfigName(".sensorpush-proxy"),
-}
-
 // Execute is the main entrypoint into the sensorpush-proxy CLI.
 func Execute() {
-	// The cobra docs show the flags getting set in init() (pre-Execute), and a
-	// cobra.OnInitialize() handler to manage any config file (which is called
-	// by cobra prior to each/any command's Execute() call).  Each subcommand
-	// *could* have distinct config/flags... I need to think about how that
-	// ought to be represented.  It would be great if the env prefix and/or
-	// config file name persisted to the subcommands by default.
-	err := asp.Attach(rootCmd, rootDefaults, aspOptions...)
-	cobra.CheckErr(err)
-
 	// if err := rootCmd.ExecuteContext(ctx); err != nil {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

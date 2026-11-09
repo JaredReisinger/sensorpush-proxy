@@ -11,40 +11,64 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
-          go-version: '>=1.23'
+          go-version-file: go.mod
 
-      - uses: arduino/setup-task@v2
+      - name: Run lint, test, and build
+        run: |
+          go mod download
+          go tool task lint
+          go tool task test
+          go tool task build
+
+      - name: Upload test coverage to Codecov
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # 7.1.1
         with:
-          # version: 3.20 # 3.x is good enough
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
-      - run: task test
+  release:
+    if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+    needs: build
+    runs-on: ubuntu-latest
 
-      - uses: codecov/codecov-action@v5
+    # write changelog at some point?
+    # permissions:
+    #   attestations: write
+    #   contents: write
 
-      # would it be better to define a separate release workflow, and call it?
-      - if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-        uses: goreleaser/goreleaser-action@v6
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Check if release is needed
+        id: check-bump
+        run: |
+          go mod download
+          go tool task tag-release
+
+
+      - uses: goreleaser/goreleaser-action@v7
         with:
           install-only: true
 
-      - if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-        uses: sigstore/cosign-installer@v3
+      - uses: sigstore/cosign-installer@v4
 
-      - if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-        uses: docker/login-action@v3
+      - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-        uses: cycjimmy/semantic-release-action@v4
+      - uses: cycjimmy/semantic-release-action@v4
         id: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,8 +81,7 @@ jobs:
             @semantic-release/exec
 
       # kick the Go package index with the new version
-      - if: ${{ steps.release.outputs.new_release_published == 'true' }}
-        run: |
+      - run: |
           curl https://proxy.golang.org/github.com/jaredreisinger/sensorpush-proxy/@v/${{ steps.release.outputs.new_release_git_tag }}.info
 
       - uses: act10ns/slack@v2
