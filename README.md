@@ -5,6 +5,7 @@ A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensor
 [![Go reference](https://img.shields.io/badge/pkg.go.dev-reference-007D9C?logo=go&logoColor=white)](https://pkg.go.dev/github.com/jaredreisinger/sensorpush-proxy)
 ![Go version](https://img.shields.io/github/go-mod/go-version/jaredreisinger/sensorpush-proxy?logo=go&logoColor=white)
 [![GitHub build](https://img.shields.io/github/actions/workflow/status/jaredreisinger/sensorpush-proxy/build.yml?branch=main&logo=github)](https://github.com/jaredreisinger/asp/actions/workflows/build.yml)
+[![Codacy grade](https://img.shields.io/codacy/grade/f71a81d3d3954ea6ac52f100b9e6ae3d?logo=codacy)](https://app.codacy.com/gh/JaredReisinger/sensorpush-proxy/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Codecov](https://img.shields.io/codecov/c/github/jaredreisinger/sensorpush-proxy?logo=codecov&label=codedov)](https://codecov.io/gh/JaredReisinger/sensorpush-proxy)
 [![Go Report Card](https://goreportcard.com/badge/jaredreisinger/sensorpush-proxy)](https://goreportcard.com/report/github.com/jaredreisinger/sensorpush-proxy)
 [![License](https://img.shields.io/github/license/jaredreisinger/sensorpush-proxy)](https://github.com/JaredReisinger/sensorpush-proxy/blob/main/LICENSE)
@@ -13,14 +14,11 @@ A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensor
 <!-- TOC -->
 
 - [Usage](#usage)
-    - [Get SensorPush credentials](#get-sensorpush-credentials)
-    - [Get sensorpush-proxy](#get-sensorpush-proxy)
-    - [Discover sensor IDs](#discover-sensor-ids)
-    - [Figure out your desired configuration and run the proxy](#figure-out-your-desired-configuration-and-run-the-proxy)
-        - [As command-line flags](#as-command-line-flags)
-        - [As environment variables](#as-environment-variables)
-        - [As a config file](#as-a-config-file)
-    - [Call the API](#call-the-api)
+  - [Get SensorPush credentials](#get-sensorpush-credentials)
+  - [Get sensorpush-proxy](#get-sensorpush-proxy)
+  - [Discover sensor IDs](#discover-sensor-ids)
+  - [Figure out your desired configuration and run the proxy](#figure-out-your-desired-configuration-and-run-the-proxy)
+  - [Call the API](#call-the-api)
 - [Background](#background)
 
 <!-- /TOC -->
