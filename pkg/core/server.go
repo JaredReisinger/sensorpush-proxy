@@ -23,6 +23,27 @@ func NewServer(
 	sensors map[string]string,
 	updatePeriod time.Duration,
 ) (*Server, error) {
+	client, err := sensorpush.NewClient(sensorPushUsername, sensorPushPassword)
+	if err != nil {
+		// log.Fatalf("unable to create client: %+v", err)
+		return nil, err
+	}
+
+	return newServer(address, client, sensors, updatePeriod)
+}
+
+// lastSampler is a dependency-injection interface to make testing of the server
+// easier
+type lastSampler interface {
+	LastSample(id string) (*sensorpush.Sample, error)
+}
+
+func newServer(
+	address string,
+	client lastSampler,
+	sensors map[string]string,
+	updatePeriod time.Duration,
+) (*Server, error) {
 	// We used to unilaterally prefix the address (port) with ":" if it was
 	// missing, but it's completely valid to pass something like "0.0.0.0:1234",
 	// so looking for a prefix isn't really the right thing to do. That said, we
@@ -32,12 +53,6 @@ func NewServer(
 	_, err := strconv.Atoi(address)
 	if err == nil && !strings.HasPrefix(address, ":") {
 		address = fmt.Sprintf(":%s", address)
-	}
-
-	client, err := sensorpush.NewClient(sensorPushUsername, sensorPushPassword)
-	if err != nil {
-		// log.Fatalf("unable to create client: %+v", err)
-		return nil, err
 	}
 
 	appCtx, appCancel := context.WithCancel(context.Background())
@@ -71,7 +86,7 @@ func NewServer(
 type Server struct {
 	server *http.Server
 
-	client       *sensorpush.Client
+	client       lastSampler
 	sensors      map[string]string
 	updatePeriod time.Duration
 
