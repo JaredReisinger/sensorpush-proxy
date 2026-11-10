@@ -15,7 +15,8 @@ ARG TARGETPLATFORM
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 COPY ${TARGETPLATFORM}/sensorpush-proxy /
-ENTRYPOINT [ "/sensorpush-proxy" ]
 
 EXPOSE 5375
 USER 1000:1000
+
+ENTRYPOINT [ "/sensorpush-proxy" ]
