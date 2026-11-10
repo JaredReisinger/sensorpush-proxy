@@ -13,7 +13,7 @@ From that original site's README:
 >
 > - [temperature/humidity data collection](#temperaturehumidity-data-collection)
 > - [bespoke data proxy](#bespoke-data-proxy)
-> - [auto-updating in-browser logic](#auto-updating-in-browser-logic)
+> - ...
 >
 > #### Temperature/humidity data collection
 >
