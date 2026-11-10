@@ -18,7 +18,7 @@
 /.task/
 /build/
 /dist/
-/coverage/
+/.coverage/
 codecov
 codecov.*
 

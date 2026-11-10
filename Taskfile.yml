@@ -7,7 +7,7 @@ vars:
   APP_EXE: "{{.APP_NAME}}{{exeExt}}"
   BUILD_DIR: build
   APP_PORT: 5375
-  COVERAGE_DIR: ./coverage
+  COVERAGE_DIR: ./.coverage
 
 # env:
 #   APP_NAME: sensorpush-proxy
