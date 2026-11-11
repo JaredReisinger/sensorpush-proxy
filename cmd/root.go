@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/jaredreisinger/asp"
+	"github.com/jaredreisinger/sensorpush-proxy/pkg/core"
 )
 
 // rootConfig is the root-level only config (common for all subcommands)
@@ -16,8 +17,10 @@ type rootConfig struct {
 }
 
 type SensorPush struct {
-	Username string `asp:"username,,,username for SensorPush"`
-	Password string `asp:"password,,,password for SensorPush,true"`
+	Username     string `asp:"username,,,username for SensorPush; supersedes the file variant"`
+	UsernameFile string `asp:"username-file,,,file for SensorPush username"`
+	Password     string `asp:"password,,,password for SensorPush; supersedes the file variant,true"`
+	PasswordFile string `asp:"password-file,,,file for SensorPush password,true"`
 }
 
 var rootCmd = &cobra.Command{
@@ -62,4 +65,23 @@ func Execute() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func getSensorPushAuth(cmd *cobra.Command) (username string, password string, err error) {
+	cfg, err := asp.Get[rootConfig](cmd.Root())
+	if err != nil {
+		return "", "", err
+	}
+	// slog.Info("got root config", "config", rootCfg)
+
+	username, err = core.GetArgOrFile(cfg.SensorPush.Username, cfg.SensorPush.UsernameFile, true)
+	if err != nil {
+		return "", "", err
+	}
+	password, err = core.GetArgOrFile(cfg.SensorPush.Password, cfg.SensorPush.PasswordFile, true)
+	if err != nil {
+		return "", "", err
+	}
+
+	return username, password, nil
 }

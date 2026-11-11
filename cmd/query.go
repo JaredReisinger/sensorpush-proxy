@@ -25,13 +25,12 @@ func init() {
 }
 
 func query(cmd *cobra.Command, args []string) error {
-	cfg, err := asp.Get[rootConfig](cmd.Root())
+	username, password, err := getSensorPushAuth(cmd)
 	if err != nil {
 		return err
 	}
-	// slog.Info("config", "cfg", cfg)
 
-	client, err := sensorpush.NewClient(cfg.SensorPush.Username, cfg.SensorPush.Password)
+	client, err := sensorpush.NewClient(username, password)
 	if err != nil {
 		return err
 	}

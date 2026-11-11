@@ -42,22 +42,20 @@ func init() {
 }
 
 func proxy(cmd *cobra.Command, args []string) error {
-	rootCfg, err := asp.Get[rootConfig](cmd.Root())
-	if err != nil {
-		return err
-	}
 	cfg, err := asp.Get[proxyConfig](cmd)
 	if err != nil {
 		return err
 	}
 
-	// slog.Info("got root config", "config", rootCfg)
-	// slog.Info("got proxy config", "config", cfg)
+	username, password, err := getSensorPushAuth(cmd)
+	if err != nil {
+		return err
+	}
 
 	server, err := core.NewServer(
 		cfg.Proxy.Port,
-		rootCfg.SensorPush.Username,
-		rootCfg.SensorPush.Password,
+		username,
+		password,
 		cfg.Proxy.Sensors,
 		cfg.Proxy.UpdatePeriod,
 	)

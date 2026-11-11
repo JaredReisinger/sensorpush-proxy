@@ -1,13 +1,12 @@
 ![sensorpush-proxy](./docs/sensorpush-proxy-logo.png)
 
-A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensorpush.com) data.
+A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensorpush.com) data.
 
 [![Go reference](https://img.shields.io/badge/pkg.go.dev-reference-007D9C?logo=go&logoColor=white)](https://pkg.go.dev/github.com/jaredreisinger/sensorpush-proxy)
 ![Go version](https://img.shields.io/github/go-mod/go-version/jaredreisinger/sensorpush-proxy?logo=go&logoColor=white)
 [![GitHub build](https://img.shields.io/github/actions/workflow/status/jaredreisinger/sensorpush-proxy/build.yml?branch=main&logo=github)](https://github.com/jaredreisinger/asp/actions/workflows/build.yml)
 [![Codacy grade](https://img.shields.io/codacy/grade/f71a81d3d3954ea6ac52f100b9e6ae3d?logo=codacy)](https://app.codacy.com/gh/JaredReisinger/sensorpush-proxy/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Codecov](https://img.shields.io/codecov/c/github/jaredreisinger/sensorpush-proxy?logo=codecov&label=codedov)](https://codecov.io/gh/JaredReisinger/sensorpush-proxy)
-[![Go Report Card](https://goreportcard.com/badge/jaredreisinger/sensorpush-proxy)](https://goreportcard.com/report/github.com/jaredreisinger/sensorpush-proxy)
 [![License](https://img.shields.io/github/license/jaredreisinger/sensorpush-proxy)](https://github.com/JaredReisinger/sensorpush-proxy/blob/main/LICENSE)
 
 
@@ -25,13 +24,13 @@ A rate-limiting, authentication-hiding proxy for [SensorPush](https://www.sensor
 
 ## Usage
 
-More than likely, you’ll want to use the already-built [Docker image](https://hub.docker.com/r/jaredreisinger/sensorpush-proxy) for this, so that you can just throw your credentials and sensor config at it and let it run behind something like Traefik or nginx. Regardless of whether you use Docker or the raw binary, `sensorpush-proxy` includes both the proxy itself and also a `query` sub-command to help you discover the sensor IDs available to you.
+More than likely, you’ll want to use the already-built [Docker image](https://hub.docker.com/r/jaredreisinger/sensorpush-proxy) for this, so that you can just throw your credentials and sensor config at it and let it run behind something like Traefik or nginx. Regardless of whether you use Docker or the raw binary, `sensorpush-proxy` includes both the proxy itself and also a `query` sub-command to help you discover the sensor IDs available to you.
 
 > _See [`docs/docker.md`](./docs/docker.md) for the Docker usage documentation._
 
 ### Get SensorPush credentials
 
-If you have any SensorPush devices, you ought to already have an account with SensorPush. In order to activate API access, you need to sign into their [Gateway Cloud Dashboard](https://dashboard.sensorpush.com/) at least once and agree to the terms of service. Once you've done that, the username and password you use for that dashboard are the same ones you need for this proxy. Unfortunately, SensorPush does not allow you to create limited-use (and revocable) tokens to use in place of your password for API access. This proxy uses the password you provide _**only**_ to retrieve the sensor data you request. Use security best practices to ensure that the password configuration you pass to this proxy is kept secret/encrypted until the last possible moment.
+If you have any SensorPush devices, you ought to already have an account with SensorPush. In order to activate API access, you need to sign into their [Gateway Cloud Dashboard](https://dashboard.sensorpush.com/) at least once and agree to the terms of service. Once you’ve done that, the username and password you use for that dashboard are the same ones you need for this proxy. Unfortunately, SensorPush does not allow you to create limited-use (and revocable) tokens to use in place of your password for API access. This proxy uses the password you provide _**only**_ to retrieve the sensor data you request. Use security best practices to ensure that the password configuration you pass to this proxy is kept secret/encrypted until the last possible moment.
 
 ### Get sensorpush-proxy
 
@@ -63,17 +62,17 @@ You should see as output several log lines that show the name, ID, and type of t
 
 ### Figure out your desired configuration and run the proxy
 
-`sensorpush-proxy` supports configuration by command-line flags, by environment variables, or by configuration file; use whichever form or combination of forms is the most convenient. _**However**_, please be aware of the risk of putting your SensorPush password in plaintext in any form. The generally-accepted best practice for things like passwords is to keep them as secrets in your CI/CD pipeline or container orchestration tool, and to provide them to `sensorpush-proxy` from there. That said, the examples here won’t show any use of secrets.
+`sensorpush-proxy` supports configuration by command-line flags, by environment variables, or by configuration file; use whichever form or combination of forms is the most convenient. _**However**_, please be aware of the risk of putting your SensorPush password in plaintext in any form. The generally-accepted best practice for things like passwords is to keep them as secrets in your CI/CD pipeline or container orchestration tool, and to provide them to `sensorpush-proxy` from there. Both the “username” and “password” values can be passed directly on the command-line (`--username`, `--password`), or indirectly via files (`--username-file`, `--password-file`). The latter is designed to work with Docker Swarm secrets or any other system that provides access to secrets via files. All that said, the examples here won’t show any use of secrets.
 
 Given the above example, let’s assume that we want to proxy the “Kitchen” (`123456.67834768348756683478`) and “Garage” (`135678.0934908340980985858`) sensors, using the names “inside” and “outside” respectively.
 
 #### As command-line flags
 
-_(Shown here across multiple lines for readability...)_
+_(Shown here across multiple lines for readability…)_
 
 ```sh
 sensorpush-proxy proxy \
-  --username YOUR_SENSORPUSH_USERNAME --password YOUR_SENSORPUSH_PASSWORD \
+  --username YOUR_SENSORPUSH_USERNAME --password-file YOUR_SENSORPUSH_PASSWORD_FILE \
   --sensors inside=123456.67834768348756683478,outside=135678.0934908340980985858
 ```
 
@@ -81,20 +80,20 @@ sensorpush-proxy proxy \
 
 ```sh
 export SPP_SENSORPUSH_USERNAME=YOUR_SENSORPUSH_USERNAME
-export SPP_SENSORPUSH_PASSWORD=YOUR_SENSORPUSH_PASSWORD
+export SPP_SENSORPUSH_PASSWORDFILE=YOUR_SENSORPUSH_PASSWORD_FILE
 export SPP_PROXY_SENSORS=inside=123456.67834768348756683478,outside=135678.0934908340980985858
 
 sensorpush-proxy proxy
 ```
 
-#### As a config file
+#### As a config file
 
-_(in ./config.yaml, say)_
+_(in `./config.yaml`, say)_
 
 ```yaml
 sensorPush:
   username: YOUR_SENSORPUSH_USERNAME
-  password: YOUR_SENSORPUSH_PASSWORD
+  passwordFile: YOUR_SENSORPUSH_PASSWORD_FILE
 
 proxy:
   sensors:
@@ -108,7 +107,7 @@ sensorpush-proxy proxy --config ./config.yaml
 
 ### Call the API
 
-There is only one API endpoint exposed at present, `/sensors`, which returns a JSON object keyed by the sensor names from the configuration.  This example pipes through `jq` purely for prettier formatting:
+There is only one API endpoint exposed at present, `/sensors`, which returns a JSON object keyed by the sensor names from the configuration. This example pipes through `jq` purely for prettier formatting:
 
 ```sh
 curl http://localhost:5375/sensors | jq .
