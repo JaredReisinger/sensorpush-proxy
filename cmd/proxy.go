@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"log"
 	"time"
 
 	"github.com/jaredreisinger/asp"
@@ -12,7 +11,7 @@ import (
 var proxyCmd = &cobra.Command{
 	Use:   "proxy",
 	Short: "Run a proxy server for specific device IDs",
-	Run:   proxy,
+	RunE:  proxy,
 }
 
 // proxyConfig is the configuration for the HTTP proxy that sensorpush-proxy
@@ -42,18 +41,18 @@ func init() {
 	rootCmd.AddCommand(proxyCmd)
 }
 
-func proxy(cmd *cobra.Command, args []string) {
+func proxy(cmd *cobra.Command, args []string) error {
 	rootCfg, err := asp.Get[rootConfig](cmd.Root())
 	if err != nil {
-		log.Fatalf("unable to get config: %+v", err)
+		return err
 	}
 	cfg, err := asp.Get[proxyConfig](cmd)
 	if err != nil {
-		log.Fatalf("unable to get config: %+v", err)
+		return err
 	}
 
-	// log.Printf("got root config: %#v", rootCfg)
-	// log.Printf("got config: %#v", cfg)
+	// slog.Info("got root config", "config", rootCfg)
+	// slog.Info("got proxy config", "config", cfg)
 
 	server, err := core.NewServer(
 		cfg.Proxy.Port,
@@ -63,8 +62,9 @@ func proxy(cmd *cobra.Command, args []string) {
 		cfg.Proxy.UpdatePeriod,
 	)
 	if err != nil {
-		log.Fatalf("unable to create server %+v", err)
+		return err
 	}
 
-	server.ListenAndServe()
+	err = server.ListenAndServe()
+	return err
 }

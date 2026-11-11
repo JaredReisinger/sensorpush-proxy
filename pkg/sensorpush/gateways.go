@@ -1,8 +1,6 @@
 package sensorpush
 
-import (
-	"log"
-)
+import "log/slog"
 
 type gatewaysRequest struct{}
 
@@ -27,10 +25,10 @@ func (c *Client) Gateways() (*Gateways, error) {
 	gateways := &Gateways{}
 	err := c.authCall("devices/gateways", &gatewaysRequest{}, gateways, 0)
 	if err != nil {
-		log.Printf("unable to get gateways: %+v", err)
+		slog.Warn("unable to get gateways", "error", err)
 		return nil, err
 	}
 
-	// log.Printf("gateways: %+v", gateways)
+	// slog.Debug("got gateways", "gateways", gateways)
 	return gateways, nil
 }

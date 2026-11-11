@@ -3,7 +3,8 @@ package jsonapi
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"time"
@@ -36,7 +37,6 @@ func NewClientWithDoer(baseURL string, requestDoer HTTPRequestDoer) (*Client, er
 	// sanity-check the baseURL?
 	url, err := url.Parse(baseURL)
 	if err != nil {
-		// log.Print("???????")
 		return nil, err
 	}
 
@@ -62,7 +62,7 @@ func (c *Client) Call(relURL string, body interface{}, response interface{}) err
 	if err != nil {
 		return err
 	}
-	// log.Printf("calculated API endpoint: %q", url)
+	slog.Debug("calculated API endpoint", "url", url)
 
 	// TODO: handle no-body case (should this be a GET?)
 
@@ -71,7 +71,7 @@ func (c *Client) Call(relURL string, body interface{}, response interface{}) err
 		return err
 	}
 
-	// log.Printf("\nposting to %q: %q", url, b)
+	slog.Debug("jsonapi posting", "url", url, "body", string(b))
 	req, err := http.NewRequest(http.MethodPost, url.String(), bytes.NewReader(b))
 	if err != nil {
 		return err
@@ -86,18 +86,16 @@ func (c *Client) Call(relURL string, body interface{}, response interface{}) err
 	res, err := c.requester.Do(req)
 
 	if err != nil {
-		// log.Printf("WHAT???\n\n\t%+v", res)
 		return err
 	}
 	defer res.Body.Close()
 
-	b, err = ioutil.ReadAll(res.Body)
-	// log.Printf("got JSON: %q", b)
+	b, err = io.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
 
-	// log.Printf("\n\n\tresponse: %+v\n\n\tbody: %q", res, b)
+	// slog.Debug("jsonapi response", "response", res, "body", string(b))
 
 	// In any sane world (?!) we could rely entirely on the HTTP status code and
 	// return (only) that when an error occurs... but there are many APIs,

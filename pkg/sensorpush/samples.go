@@ -1,7 +1,7 @@
 package sensorpush
 
 import (
-	"log"
+	"log/slog"
 	"time"
 )
 
@@ -41,15 +41,12 @@ func (c *Client) LastSample(deviceID string) (*Sample, error) {
 	samples := &samplesResponse{}
 	err := c.authCall("samples", &samplesRequest{Sensors: []string{deviceID}, Limit: 1}, samples, 0)
 	if err != nil {
-		log.Printf("unable to get samples: %+v", err)
+		slog.Warn("unable to get samples", "error", err)
 		return nil, err
 	}
 
-	// log.Printf("got samples: %+v", samples)
-
+	// slog.Debug("got samples", "samples", samples)
 	sample := samples.Sensors[deviceID][0]
-
-	// log.Printf("SAMPLE: %s: %fF, %f%%RH", sample.Observed, sample.Temperature, sample.Humidity)
 
 	return &sample, nil
 }

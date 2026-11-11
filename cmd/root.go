@@ -48,7 +48,6 @@ var (
 )
 
 func SetVars(versionX string, commitX string, dateX string) {
-	// log.Printf()
 	version = versionX
 	commit = commitX
 	date = dateX

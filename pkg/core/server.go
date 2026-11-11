@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"maps"
 	"net/http"
 	"strconv"
@@ -25,7 +25,6 @@ func NewServer(
 ) (*Server, error) {
 	client, err := sensorpush.NewClient(sensorPushUsername, sensorPushPassword)
 	if err != nil {
-		// log.Fatalf("unable to create client: %+v", err)
 		return nil, err
 	}
 
@@ -98,14 +97,14 @@ type Server struct {
 	appCancel context.CancelFunc
 }
 
-func (s *Server) ListenAndServe() {
+func (s *Server) ListenAndServe() error {
 	s.runBackgroundUpdates()
 	shutdownContext := s.runShutdownHandler()
 
-	log.Printf("listening on %q", s.server.Addr)
+	slog.Info("listening", "address", s.server.Addr)
 	err := s.server.ListenAndServe()
 	<-shutdownContext.Done()
-	log.Printf("exiting: %+v", err)
+	return err
 }
 
 func (s *Server) sensorsHandler(w http.ResponseWriter, req *http.Request) {
@@ -140,25 +139,26 @@ func (s *Server) updater() {
 	defer s.mutex.Unlock()
 
 	for key, id := range s.sensors {
-		// log.Printf("getting last sample for %q...", key)
+		slog.Debug("getting most-recent sample", "key", key)
 		sample, err := s.client.LastSample(id)
 		if err != nil {
-			log.Printf("unable to get sample for %q: %+v", key, err)
+			slog.Warn("UPDATER: unable to get sample", "key", key, "id", id, "error", err)
 
 			// if we're 5 times past the last successful call, it's time to
 			// cancel and exit, and let a new process/container start up...
 			// but to be fair, we don't really have an expectation that
 			// doing so will fix things, do we?
 			if time.Since(s.lastSuccessfulCall) > (5 * s.updatePeriod) {
+				slog.Error("UPDATER: unable to get sample five times; canceling proxy")
 				s.appCancel()
 			}
 		} else {
-			log.Printf(
-				"UPDATER: %s: %.1f°F, %.1f%%RH (%s)",
-				sample.Observed.Local().Format(time.RFC3339),
-				sample.Temperature,
-				sample.Humidity,
-				key,
+			slog.Info("UPDATER: got sample",
+				"key", key,
+				"utc", sample.Observed,
+				"local", sample.Observed.Local(),
+				"temp", sample.Temperature,
+				"humidity", sample.Humidity,
 			)
 			s.lastSamples[key] = *sample
 			s.lastSuccessfulCall = time.Now()
@@ -169,7 +169,7 @@ func (s *Server) updater() {
 // Should this take context instead of returning a channel?
 func (s *Server) runBackgroundUpdates() {
 
-	log.Print("starting background updater...")
+	slog.Info("starting background updater...")
 
 	ticker := time.NewTicker(s.updatePeriod)
 	go func() {
@@ -180,7 +180,7 @@ func (s *Server) runBackgroundUpdates() {
 				s.updater()
 
 			case <-s.appCtx.Done():
-				log.Print("received signal to cancel/shutdown background")
+				slog.Info("received signal to cancel/shutdown background")
 				ticker.Stop()
 				return
 			}
@@ -194,12 +194,12 @@ func (s *Server) runShutdownHandler() context.Context {
 	shutdownContext, shutdownComplete := context.WithCancel(context.Background())
 	go func() {
 		<-s.appCtx.Done()
-		log.Print("received signal to cancel/shutdown app")
+		slog.Info("received signal to cancel/shutdown app")
 		ctx, cancel := context.WithTimeout(shutdownContext, 10*time.Second)
 		defer cancel()
 		err := s.server.Shutdown(ctx)
 		if err != nil {
-			log.Printf("unable to shutdown? %+v", err)
+			slog.Error("error shutting down", "error", err)
 		}
 		shutdownComplete()
 	}()

@@ -2,7 +2,7 @@ package sensorpush
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/jaredreisinger/sensorpush-proxy/pkg/jsonapi"
@@ -81,10 +81,10 @@ func (c *Client) authorize() error {
 	authorize := &authorizeResponse{}
 	err := c.client.Call("oauth/authorize", &authorizeRequest{Email: c.email, Password: c.password}, authorize)
 	if err != nil {
-		log.Printf("unable to authorize: %+v", err)
+		slog.Error("unable to authorize", "email", c.email, "error", err)
 		return err
 	}
-	// log.Printf("got auth: %+v", authorize)
+	// slog.Debug("got authorization", "auth", authorize)
 	c.authToken = authorize.Authorization
 	return nil
 }
@@ -105,14 +105,14 @@ func (c *Client) access(depth int) error {
 	err = c.client.Call("oauth/accesstoken", &accessTokenRequest{Authorization: c.authToken}, accessToken)
 	// exit early on success
 	if err == nil {
-		// log.Printf("got access token: %+v", accessToken)
+		// slog.Debug("got access token", "token", accessToken)
 		c.accessToken = accessToken.AccessToken
 		// also update the default headers...
 		c.client.Header().Set("Authorization", c.accessToken)
 		return nil
 	}
 
-	log.Printf("unable to get access token: %+v", err)
+	slog.Warn("unable to get access token", "error", err)
 	// TODO: check if authorization token expired and we need to sign in
 	// again?
 	// now call recursively unless we've reached our maximum depth!
@@ -143,7 +143,7 @@ func (c *Client) authCall(relURL string, input interface{}, output interface{}, 
 	case *jsonapi.HTTPStatusError:
 		errorBody := &errorResponse{}
 		json.Unmarshal(t.Body, errorBody) // ignore error?
-		log.Printf("alternate view of error (%s): %#v", t.Error(), errorBody)
+		slog.Info("alternate view of error", "error", t.Error(), "errorBody", errorBody)
 		if errorBody.Type == "ACCESS_DENIED" {
 			c.accessToken = ""
 			// now call recursively unless we've reached our maximum depth!
@@ -152,7 +152,7 @@ func (c *Client) authCall(relURL string, input interface{}, output interface{}, 
 			}
 		}
 	default:
-		log.Printf("unable to get %q: %+v", relURL, err)
+		slog.Warn("unable to get", "url", relURL, "error", err)
 	}
 	return err
 }

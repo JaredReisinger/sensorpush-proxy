@@ -1,8 +1,6 @@
 package sensorpush
 
-import (
-	"log"
-)
+import "log/slog"
 
 type sensorsRequest struct{}
 
@@ -29,10 +27,10 @@ func (c *Client) Sensors() (*Sensors, error) {
 	sensors := &Sensors{}
 	err := c.authCall("devices/sensors", &sensorsRequest{}, sensors, 0)
 	if err != nil {
-		log.Printf("unable to get sensors: %+v", err)
+		slog.Warn("unable to get sensors", "error", err)
 		return nil, err
 	}
 
-	// log.Printf("sensors: %+v", sensors)
+	// slog.Debug("got sensors", "sensors", sensors)
 	return sensors, nil
 }

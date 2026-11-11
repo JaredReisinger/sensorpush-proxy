@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/jaredreisinger/asp"
 	"github.com/jaredreisinger/sensorpush-proxy/pkg/sensorpush"
@@ -11,7 +11,7 @@ import (
 var queryCmd = &cobra.Command{
 	Use:   "query",
 	Short: "Show all of the available device IDs for the user",
-	Run:   query,
+	RunE:  query,
 }
 
 type queryConfig struct {
@@ -24,40 +24,42 @@ func init() {
 	rootCmd.AddCommand(queryCmd)
 }
 
-func query(cmd *cobra.Command, args []string) {
+func query(cmd *cobra.Command, args []string) error {
 	cfg, err := asp.Get[rootConfig](cmd.Root())
 	if err != nil {
-		log.Fatalf("unable to get config: %+v", err)
+		return err
 	}
-	// log.Printf("got config: %#v", cfg)
+	// slog.Info("config", "cfg", cfg)
 
 	client, err := sensorpush.NewClient(cfg.SensorPush.Username, cfg.SensorPush.Password)
 	if err != nil {
-		log.Fatalf("unable to create client: %+v", err)
+		return err
 	}
 
 	gateways, err := client.Gateways()
 	if err != nil {
-		log.Printf("unable to get gateways: %+v", err)
+		return err
 	}
 
-	log.Print("Gateways")
+	fmt.Print("Gateways\n")
 	for _, gateway := range *gateways {
-		log.Printf("  %s", gateway.Name)
-		log.Printf("    ID  : %q", gateway.ID)
-		log.Printf("    Version: %s", gateway.Version)
-		log.Printf("    Paired: %t", gateway.Paired)
+		fmt.Printf("  %s\n", gateway.Name)
+		fmt.Printf("    ID     : %s\n", gateway.ID)
+		fmt.Printf("    Version: %s\n", gateway.Version)
+		fmt.Printf("    Paired : %t\n", gateway.Paired)
 	}
 
 	sensors, err := client.Sensors()
 	if err != nil {
-		log.Printf("unable to get sensors: %+v", err)
+		return err
 	}
 
-	log.Print("Sensors")
+	fmt.Print("Sensors\n")
 	for _, sensor := range *sensors {
-		log.Printf("  %s", sensor.Name)
-		log.Printf("    ID  : %q", sensor.ID)
-		log.Printf("    Type: %s", sensor.Type)
+		fmt.Printf("  %s\n", sensor.Name)
+		fmt.Printf("    ID  : %s\n", sensor.ID)
+		fmt.Printf("    Type: %s\n", sensor.Type)
 	}
+
+	return nil
 }
