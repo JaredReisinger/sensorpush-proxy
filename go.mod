@@ -12,7 +12,6 @@ require (
 	cel.dev/expr v0.25.2 // indirect
 	charm.land/bubbles/v2 v2.2.1 // indirect
 	charm.land/bubbletea/v2 v2.1.0 // indirect
-	charm.land/fang/v2 v2.0.1 // indirect
 	charm.land/lipgloss/v2 v2.0.6 // indirect
 	cloud.google.com/go v0.123.0 // indirect
 	cloud.google.com/go/auth v0.24.0 // indirect
@@ -22,6 +21,7 @@ require (
 	cloud.google.com/go/monitoring v1.31.0 // indirect
 	cloud.google.com/go/storage v1.65.1 // indirect
 	dario.cat/mergo v1.0.2 // indirect
+	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.38.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.62.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.62.0 // indirect
@@ -29,6 +29,7 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
+	github.com/SemRels/semrel v0.28.3 // indirect
 	github.com/alecthomas/chroma/v2 v2.27.0 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.47.1 // indirect
@@ -50,14 +51,11 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.51.1 // indirect
 	github.com/aws/smithy-go v1.28.1 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
-	github.com/caarlos0/go-version v0.2.2 // indirect
-	github.com/caarlos0/svu/v3 v3.4.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chainguard-dev/git-urls v1.0.2 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20261008173134-6b8d4baf91b4 // indirect
 	github.com/charmbracelet/x/ansi v0.11.9 // indirect
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20250603201427-c31516f43444 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
 	github.com/charmbracelet/x/termios v0.1.1 // indirect
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
@@ -80,11 +78,11 @@ require (
 	github.com/go-jose/go-jose/v4 v4.1.9 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-sprout/sprout v1.1.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/go-task/task/v3 v3.54.0 // indirect
 	github.com/go-task/template v0.2.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
-	github.com/gobwas/glob v1.1.0 // indirect
 	github.com/google/s2a-go v0.1.10 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.22 // indirect
@@ -110,10 +108,6 @@ require (
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
-	github.com/muesli/mango v0.2.0 // indirect
-	github.com/muesli/mango-cobra v1.3.0 // indirect
-	github.com/muesli/mango-pflag v0.1.0 // indirect
-	github.com/muesli/roff v0.1.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
 	github.com/pierrec/lz4/v4 v4.1.27 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -173,7 +167,7 @@ require (
 )
 
 tool (
-	github.com/caarlos0/svu/v3
+	github.com/SemRels/semrel/cmd/semrel
 	github.com/conventionalcommit/commitlint
 	github.com/go-task/task/v3/cmd/task
 	github.com/jaredreisinger/committed

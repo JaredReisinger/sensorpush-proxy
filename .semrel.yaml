@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://registry.semrel.io/schemas/core/v1.json
+# semrel configuration — https://semrel.io/guide/configuration/
+schemaVersion: 1
+
+# Branches that trigger a release.
+branches:
+  - name: main
+
+tagPrefix: "v"
+
+# Commit type → SemVer bump. Breaking changes (feat! / BREAKING CHANGE:) always → major.
+# rules:
+#   - type: feat
+#     bump: minor
+#   - type: fix
+#     bump: patch
+#   - type: perf
+#     bump: patch
+#   - type: revert
+#     bump: patch
+
+commit_changelog: false # use the changelog generator instead
+
+# Plugins run in order. condition → pre-tag → release (default).
+plugins:
+  # - uses: "@semrel/condition-github-actions"
+  #   phase: condition
+
+  - uses: "@semrel/analyzer-conventional"
+
+  - uses: "@semrel/generator-release-notes"
+    phase: generator
+    args:
+      # template: NYI
+      max_commits: 999
+
+  - uses: "@semrel/generator-changelog-md"
+    phase: pre-tag
+    # phase: generator
+    args:
+      # template: NYI
+      keep_releases: 999
+      max_commits: 999
+      link_prs: true
+      link_commits: true
+
+  # use git instead of github... semrel pushes the CHANGELOG and tag, and then
+  # GoReleaser publishes the release
+  - uses: "@semrel/provider-git"
+    args:
+      push_branch: true

@@ -38,16 +38,14 @@ jobs:
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
-
   release:
     if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
     needs: build
     runs-on: ubuntu-latest
 
-    # write changelog at some point?
-    # permissions:
-    #   attestations: write
-    #   contents: write
+    permissions:
+      # attestations: write
+      contents: write
 
     steps:
       - uses: actions/checkout@v7
@@ -58,39 +56,48 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Check if release is needed
-        id: check-bump
+      - name: Run semrel release
+        id: semrel
         run: |
           go mod download
-          go tool task tag-release
+          git config user.name "SemRel Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          go tool semrel release --github-output
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - if: ${{ steps.check-bump.outputs.do_release == 'true' }}
+      # install the GoReleaser/signing/docker tooling
+
+      - if: steps.semrel.outputs.released == 'true'
         uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
         with:
           install-only: true
 
-      - if: ${{ steps.check-bump.outputs.do_release == 'true' }}
+      - if: steps.semrel.outputs.released == 'true'
         uses: sigstore/cosign-installer@756fe2d284c7292c4e9b62c8a28f1e5629c59532 # v4.1.3
 
-      - if: ${{ steps.check-bump.outputs.do_release == 'true' }}
+      - if: steps.semrel.outputs.released == 'true'
         name: Set up signing keys
         run: |
           printf "%s" '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
 
-      - if: ${{ steps.check-bump.outputs.do_release == 'true' }}
+      - if: steps.semrel.outputs.released == 'true'
         uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
 
-      - if: ${{ steps.check-bump.outputs.do_release == 'true' }}
+      - if: steps.semrel.outputs.released == 'true'
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
-      - if: ${{ steps.check-bump.outputs.do_release == 'true' }}
+      - if: steps.semrel.outputs.released == 'true'
         uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - if: ${{ steps.check-bump.outputs.do_release == 'true' }}
-        run: go tool task release
+      - if: steps.semrel.outputs.released == 'true'
+        run: |
+          echo "Preparing release notes for GoReleaser..."
+          printf "%s" "${{ steps.semrel.outputs.changelog }}" > .RELEASE-NOTES.md
+          go tool task release -- --release-notes .RELEASE-NOTES.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
@@ -100,9 +107,9 @@ jobs:
           rm -f cosign.key
 
       # kick the Go package index with the new version
-      - if: ${{ steps.check-bump.outputs.do_release == 'true' }}
+      - if: steps.semrel.outputs.released == 'true'
         run: |
-          curl https://proxy.golang.org/github.com/jaredreisinger/sensorpush-proxy/@v/${{ steps.check-bump.outputs.version }}.info
+          curl "https://proxy.golang.org/github.com/jaredreisinger/sensorpush-proxy/@v/${{ steps.semrel.outputs.tag }}.info"
 
       - uses: act10ns/slack@d96404edccc6d6467fc7f8134a420c851b1e9054 # v2.2.0
         if: always()

@@ -1,0 +1,58 @@
+{
+  "semrelLockVersion": 1,
+  "updatedAt": "2026-11-12T04:28:30Z",
+  "plugins": [
+    {
+      "binaryName": "semrel-plugin-conventional",
+      "ref": "@semrel/analyzer-conventional",
+      "version": "0.4.1",
+      "checksums": {
+        "darwin_amd64": "5a6065ca2a918e0fc5c8b7ce2beca9275fd7f68ab42da86852566b1ba22d899e",
+        "darwin_arm64": "3546a12888c23607e7750e9d457696da8e17e96482e64e2bcf4a348b7e856c67",
+        "linux_amd64": "d160fe1e63fbeecaf665bc6c7ffe02a0cbbed4be5db29aaa54228391cc0dde0a",
+        "linux_arm64": "4f7e0b729e76f60f60e311229875b36bd2a6e7ce993871b213c8245902276141",
+        "windows_amd64": "68954cee220cda8c35203f7873da3feb16679ca0a711104d08034a7e4d812156",
+        "windows_arm64": "377485b71306ba1b010d62f7d9790fd2b544e1144a915f74dcb2484911add05e"
+      }
+    },
+    {
+      "binaryName": "semrel-plugin-changelog-md",
+      "ref": "@semrel/generator-changelog-md",
+      "version": "0.8.0",
+      "checksums": {
+        "darwin_amd64": "930753a77e66ae47b821cf8fc19fd387c73df875f0fff4d518fc1effc1d9dfa7",
+        "darwin_arm64": "63ca5d0d68e84ff41177284211a004c7b3440bc166441971f76a57e6b51ce888",
+        "linux_amd64": "225f23784b040aae2e0b9591a185ed8a5a66639549cbefba1cfa29ed9953bc95",
+        "linux_arm64": "0d3c142c2e422d64795573d50d7c0c8165a3708cad56d79c86fdbe0e53d05da9",
+        "windows_amd64": "a35e5f99ee94322ed9375d3c4aa1113e8ea620446f0e3ce7f0b25fa58cafb730",
+        "windows_arm64": "daa40fa2545240dfc1e0f94722f696b73b568374685cf7f8f8452e742a29b12c"
+      }
+    },
+    {
+      "binaryName": "semrel-plugin-release-notes",
+      "ref": "@semrel/generator-release-notes",
+      "version": "0.7.0",
+      "checksums": {
+        "darwin_amd64": "3ecf1b777b941bbfe427bdde27071bf86f0678dc77fdeb1c2ba9128134c453fe",
+        "darwin_arm64": "74c5bf6c0ffb105182a5df0dca730aa1588ee8b6e9d39e16c67491b3f6f725a1",
+        "linux_amd64": "9b4878909e2c337a43a9d7a3b2626673caade0b8f06aaddf2c1ddb69662fd900",
+        "linux_arm64": "3104434a278298bb030bb333f1c8a3d8de40c96b8bb1793ea86fb7c3894cba03",
+        "windows_amd64": "e198b44b96202beae9b0bae147f753fc550a97c894c8ab9aaceec7fe61ad5cc1",
+        "windows_arm64": "af0ccaecb8c5a5f5b6b2c6d69144a5045c61aad3fc50cd1a22b0bb4c1c218734"
+      }
+    },
+    {
+      "binaryName": "semrel-plugin-git",
+      "ref": "@semrel/provider-git",
+      "version": "0.5.0",
+      "checksums": {
+        "darwin_amd64": "2631623e2c8e51373bf05b3a1e75cc69d76a75271194a67808dd87f5c9591118",
+        "darwin_arm64": "b50f5262d31ac4f3759bc4c466591993aeb273d3ac3857a4beb02c996e4ab5f9",
+        "linux_amd64": "9585d24672da84a6ec1777f752954a691bc3cdd37869052246f9adff7ffef8f2",
+        "linux_arm64": "4d2507a123dcbb4a29be7645fba1b7059adf2f9a42811c81d45c527d14af2b40",
+        "windows_amd64": "fdbba4cdb0f55e9a1daf2a071012e6729685aa9d9fddf0936ebf9f0901d2de35",
+        "windows_arm64": "2340a8db74606152892620daf9448f5432ad4a38a5a3914448be65829ddb11c8"
+      }
+    }
+  ]
+}

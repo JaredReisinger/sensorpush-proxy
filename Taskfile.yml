@@ -91,40 +91,6 @@ tasks:
     cmds:
       - task: lint
 
-  tag-release:
-    desc: tags the next release if warranted (and on CI)
-    vars:
-      VER_CUR:
-        sh: go tool svu current
-      VER_NEXT:
-        sh: go tool svu next
-    cmds:
-      - cmd: echo "svu says {{.VER_CUR}} -> {{.VER_NEXT}}"
-        silent: true
-      - if: '{{ne .VER_NEXT .VER_CUR}}'
-        task: tag-release:ci
-        vars:
-          VERSION: '{{.VER_NEXT}}'
-      - if: '{{eq .VER_NEXT .VER_CUR}}'
-        cmd: echo "no new tag created"
-        silent: true
-
-  # note that tag-release:ci must be run with permissions to write to the
-  # contents of the repo
-  tag-release:ci:
-    internal: true
-    preconditions:
-      - sh: '[ "${CI}" == "true" ]'
-    requires:
-      vars: [ VERSION ]
-    cmds:
-      - git config user.name "github-actions[bot]"
-      - git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - git tag -a "{{.VERSION}}" -m "release {{.VERSION}}"
-      - git push --tags
-      - echo "do_release=true" >> "${GITHUB_OUTPUT}"
-      - echo "version={{.VERSION}}" >> "${GITHUB_OUTPUT}"
-
   release:test:
     desc: test the release process
     cmds:
@@ -142,8 +108,7 @@ tasks:
     preconditions:
       - sh: '[ "${CI}" == "true" ]'
     cmds:
-      # - goreleaser release --release-notes /tmp/release-notes.md --clean
-      - goreleaser release --clean
+      - goreleaser release --clean {{.CLI_ARGS}}
 
   query:
     desc: Runs the {{.TASK}} command directly from source

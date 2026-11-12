@@ -17,6 +17,7 @@
       "ldflags",
       "mapstructure",
       "netgo",
+      "semrel",
       "Sensorer",
       "sensorpush",
       "sigstore",

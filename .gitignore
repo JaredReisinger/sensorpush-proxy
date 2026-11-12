@@ -26,3 +26,7 @@ codecov.*
 cosign.key
 .sensorpush-proxy.*
 
+# semrel
+.semrel-analytics.jsonl
+.semrel/
+.RELEASE-NOTES.md
