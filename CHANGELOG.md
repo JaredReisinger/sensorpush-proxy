@@ -1,7 +1,7 @@
-# Changelog
+## v0.2.1 (2026-11-12)
 
-_All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/) for commit guidelines._
-
+### Bug Fixes
+- fix: switch to semrel.io for semrel version detection
 
 ## [0.1.8](https://github.com/JaredReisinger/sensorpush-proxy/compare/v0.1.7...v0.1.8) (2026-11-09)
 
